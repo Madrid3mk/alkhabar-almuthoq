@@ -1,0 +1,50 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "hGd8Ivs0YQB75z33MtJFG"
+uri = "file://artifacts/trusted-news/src/assets/images/city-smoke.png"
+type = "image"
+title = "City skyline with smoke"
+
+[[generated]]
+id = "gguplZDD6vd5BSrM773BC"
+uri = "file://artifacts/trusted-news/src/assets/images/gov-conference.png"
+type = "image"
+title = "Government conference"
+
+[[generated]]
+id = "5X5omnYs2w70NBEjX-OAD"
+uri = "file://artifacts/trusted-news/src/assets/images/storm.png"
+type = "image"
+title = "Weather storm scene"
+
+[[generated]]
+id = "kfiFcJlXGr3YyeHYnW1QA"
+uri = "file://artifacts/trusted-news/src/assets/images/science-lab.png"
+type = "image"
+title = "Science lab"
+
+[[generated]]
+id = "TII-Siz56h80ck9Q0aAkR"
+uri = "file://artifacts/trusted-news/src/assets/avatars/avatar-1.png"
+type = "image"
+title = "Portrait avatar 1"
+
+[[generated]]
+id = "aWYs8vtx0FOyQrYaFiG_c"
+uri = "file://artifacts/trusted-news/src/assets/avatars/avatar-2.png"
+type = "image"
+title = "Portrait avatar 2"
+
+[[generated]]
+id = "PPgm47tqnGriiBFklYfxG"
+uri = "file://artifacts/trusted-news/src/assets/avatars/avatar-3.png"
+type = "image"
+title = "Portrait avatar 3"
+
+[[generated]]
+id = "3Aolww9UgECS7aP4tdi3u"
+uri = "file://artifacts/trusted-news/src/assets/avatars/avatar-4.png"
+type = "image"
+title = "Portrait avatar 4"

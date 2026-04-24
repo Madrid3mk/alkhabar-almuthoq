@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "الخبر الموثوق"
+version = "1.0.0"
+id = "artifacts/trusted-news"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23646
+
+[services.development]
+run = "pnpm --filter @workspace/trusted-news run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/trusted-news", "run", "build" ]
+publicDir = "artifacts/trusted-news/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23646"
+BASE_PATH = "/"

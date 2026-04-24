@@ -3,20 +3,27 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: News verification platform API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: news
+    description: News articles and verification
+  - name: sources
+    description: Trusted source registry
+  - name: users
+    description: User profiles and reputation
+  - name: dashboard
+    description: Aggregated dashboard data
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +31,666 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /news:
+    get:
+      operationId: listNews
+      tags: [news]
+      summary: List news articles ranked by trust + recency
+      parameters:
+        - name: feed
+          in: query
+          schema:
+            type: string
+            enum: [for_you, important, local, world]
+        - name: confidence
+          in: query
+          schema:
+            type: string
+            enum: [high, medium, low]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 30
+      responses:
+        "200":
+          description: News list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NewsCard"
+    post:
+      operationId: submitNews
+      tags: [news]
+      summary: Submit a news item for verification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitNewsInput"
+      responses:
+        "201":
+          description: Submitted, verification pipeline started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsDetail"
+
+  /news/{id}:
+    get:
+      operationId: getNews
+      tags: [news]
+      summary: Get a news article with full verification info
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: News detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsDetail"
+
+  /news/{id}/verification:
+    get:
+      operationId: getVerification
+      tags: [news]
+      summary: Get the live verification pipeline status for a news item
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Verification report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerificationReport"
+
+  /news/{id}/like:
+    post:
+      operationId: toggleLike
+      tags: [news]
+      summary: Toggle like on a news item
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: New like state
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [liked, likes]
+                properties:
+                  liked:
+                    type: boolean
+                  likes:
+                    type: integer
+
+  /news/{id}/comments:
+    get:
+      operationId: listComments
+      tags: [news]
+      summary: List comments on a news item
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Comment"
+
+  /sources:
+    get:
+      operationId: listSources
+      tags: [sources]
+      summary: Source registry, optionally filtered by type
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [trusted, newspapers, channels, websites]
+        - name: q
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Sources
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Source"
+
+  /sources/{id}:
+    get:
+      operationId: getSource
+      tags: [sources]
+      summary: Source profile with history and related news
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Source detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SourceDetail"
+
+  /sources/leaderboard:
+    get:
+      operationId: getSourceLeaderboard
+      tags: [sources]
+      summary: Top sources by trust score
+      responses:
+        "200":
+          description: Top sources
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Source"
+
+  /users/me:
+    get:
+      operationId: getMe
+      tags: [users]
+      summary: Current user profile with reputation
+      responses:
+        "200":
+          description: Me
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
+  /users/{id}:
+    get:
+      operationId: getUser
+      tags: [users]
+      summary: Public user profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
+  /users/{id}/news:
+    get:
+      operationId: getUserNews
+      tags: [users]
+      summary: News submitted by a user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: News list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NewsCard"
+
+  /trust-tiers:
+    get:
+      operationId: listTrustTiers
+      tags: [users]
+      summary: Trust tier definitions and progression rules
+      responses:
+        "200":
+          description: Trust tiers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TrustTier"
+
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Aggregate platform metrics
+      responses:
+        "200":
+          description: Summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /dashboard/trending:
+    get:
+      operationId: getTrendingNews
+      tags: [dashboard]
+      summary: Trending verified news right now
+      responses:
+        "200":
+          description: Trending
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NewsCard"
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
 
+    Confidence:
+      type: string
+      enum: [high, medium, low]
+
+    NewsStatus:
+      type: string
+      enum: [verifying, verified, unverified, rejected]
+
+    Feed:
+      type: string
+      enum: [for_you, important, local, world]
+
+    SourceType:
+      type: string
+      enum: [news_agency, newspaper, tv_channel, website, official]
+
+    TrustTierName:
+      type: string
+      enum: [regular, trusted, verified_publisher]
+
+    AuthorMini:
+      type: object
+      required: [id, name, handle, tier, accuracyScore]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        handle:
+          type: string
+        avatarUrl:
+          type: string
+        tier:
+          $ref: "#/components/schemas/TrustTierName"
+        accuracyScore:
+          type: number
+
+    SourceMini:
+      type: object
+      required: [id, name, url, score, type]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        url:
+          type: string
+        score:
+          type: number
+        type:
+          $ref: "#/components/schemas/SourceType"
+        verified:
+          type: boolean
+
+    NewsCard:
+      type: object
+      required:
+        [
+          id,
+          title,
+          summary,
+          status,
+          confidence,
+          confidenceScore,
+          category,
+          publishedAt,
+          author,
+          stats,
+          sourcesCount,
+        ]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        summary:
+          type: string
+        imageUrl:
+          type: string
+        status:
+          $ref: "#/components/schemas/NewsStatus"
+        confidence:
+          $ref: "#/components/schemas/Confidence"
+        confidenceScore:
+          type: number
+        category:
+          type: string
+        location:
+          type: string
+        publishedAt:
+          type: string
+        author:
+          $ref: "#/components/schemas/AuthorMini"
+        sourcesCount:
+          type: integer
+        stats:
+          type: object
+          required: [likes, comments, shares]
+          properties:
+            likes:
+              type: integer
+            comments:
+              type: integer
+            shares:
+              type: integer
+
+    NewsDetail:
+      allOf:
+        - $ref: "#/components/schemas/NewsCard"
+        - type: object
+          required: [body, sources, aiExplanation, claims]
+          properties:
+            body:
+              type: string
+            sources:
+              type: array
+              items:
+                $ref: "#/components/schemas/SourceMini"
+            aiExplanation:
+              type: object
+              required: [verdict, reasons]
+              properties:
+                verdict:
+                  type: string
+                reasons:
+                  type: array
+                  items:
+                    type: object
+                    required: [text, ok]
+                    properties:
+                      text:
+                        type: string
+                      ok:
+                        type: boolean
+            claims:
+              type: array
+              items:
+                type: object
+                required: [text, supported]
+                properties:
+                  text:
+                    type: string
+                  supported:
+                    type: boolean
+
+    SubmitNewsInput:
+      type: object
+      required: [title, body, sourceUrls]
+      properties:
+        title:
+          type: string
+          minLength: 8
+        body:
+          type: string
+          minLength: 30
+        sourceUrls:
+          type: array
+          minItems: 1
+          items:
+            type: string
+        mediaUrl:
+          type: string
+        category:
+          type: string
+        location:
+          type: string
+
+    VerificationStage:
+      type: object
+      required: [key, label, status]
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        status:
+          type: string
+          enum: [pending, running, passed, failed]
+        detail:
+          type: string
+
+    VerificationReport:
+      type: object
+      required: [newsId, progress, stages, etaSeconds]
+      properties:
+        newsId:
+          type: string
+        progress:
+          type: number
+        etaSeconds:
+          type: integer
+        stages:
+          type: array
+          items:
+            $ref: "#/components/schemas/VerificationStage"
+        finalConfidence:
+          $ref: "#/components/schemas/Confidence"
+        finalScore:
+          type: number
+
+    Comment:
+      type: object
+      required: [id, author, body, createdAt]
+      properties:
+        id:
+          type: string
+        author:
+          $ref: "#/components/schemas/AuthorMini"
+        body:
+          type: string
+        createdAt:
+          type: string
+
+    Source:
+      type: object
+      required: [id, name, url, score, type]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        url:
+          type: string
+        score:
+          type: number
+        type:
+          $ref: "#/components/schemas/SourceType"
+        verified:
+          type: boolean
+        articlesCount:
+          type: integer
+        accuracyHistory:
+          type: array
+          items:
+            type: number
+
+    SourceDetail:
+      allOf:
+        - $ref: "#/components/schemas/Source"
+        - type: object
+          required: [bio, recentNews]
+          properties:
+            bio:
+              type: string
+            recentNews:
+              type: array
+              items:
+                $ref: "#/components/schemas/NewsCard"
+            relatedSources:
+              type: array
+              items:
+                $ref: "#/components/schemas/Source"
+
+    UserProfile:
+      type: object
+      required:
+        [
+          id,
+          name,
+          handle,
+          tier,
+          accuracyScore,
+          consistencyScore,
+          publishedCount,
+          correctCount,
+        ]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        handle:
+          type: string
+        avatarUrl:
+          type: string
+        bio:
+          type: string
+        tier:
+          $ref: "#/components/schemas/TrustTierName"
+        accuracyScore:
+          type: number
+        consistencyScore:
+          type: number
+        publishedCount:
+          type: integer
+        correctCount:
+          type: integer
+        followers:
+          type: integer
+        following:
+          type: integer
+        progressToNextTier:
+          type: number
+
+    TrustTier:
+      type: object
+      required: [name, label, requirements, perks, color]
+      properties:
+        name:
+          $ref: "#/components/schemas/TrustTierName"
+        label:
+          type: string
+        description:
+          type: string
+        color:
+          type: string
+        requirements:
+          type: array
+          items:
+            type: object
+            required: [text, met]
+            properties:
+              text:
+                type: string
+              met:
+                type: boolean
+              progress:
+                type: number
+        perks:
+          type: array
+          items:
+            type: string
+
+    DashboardSummary:
+      type: object
+      required:
+        [
+          totalNews,
+          verifiedToday,
+          rejectedToday,
+          activePublishers,
+          averageConfidence,
+          trustDistribution,
+          topCategories,
+        ]
+      properties:
+        totalNews:
+          type: integer
+        verifiedToday:
+          type: integer
+        rejectedToday:
+          type: integer
+        activePublishers:
+          type: integer
+        averageConfidence:
+          type: number
+        trustDistribution:
+          type: object
+          required: [high, medium, low]
+          properties:
+            high:
+              type: integer
+            medium:
+              type: integer
+            low:
+              type: integer
+        topCategories:
+          type: array
+          items:
+            type: object
+            required: [name, count]
+            properties:
+              name:
+                type: string
+              count:
+                type: integer
