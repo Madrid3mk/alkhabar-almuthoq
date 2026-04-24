@@ -77,6 +77,15 @@ export type NewsCardStats = {
   shares: number;
 };
 
+export type NewsCardRumorVerdict =
+  (typeof NewsCardRumorVerdict)[keyof typeof NewsCardRumorVerdict];
+
+export const NewsCardRumorVerdict = {
+  false_rumor: "false_rumor",
+  true_claim: "true_claim",
+  partly_true: "partly_true",
+} as const;
+
 export interface NewsCard {
   id: string;
   title: string;
@@ -91,6 +100,9 @@ export interface NewsCard {
   author: AuthorMini;
   sourcesCount: number;
   stats: NewsCardStats;
+  isRumorCheck?: boolean;
+  rumorClaim?: string;
+  rumorVerdict?: NewsCardRumorVerdict;
 }
 
 export type NewsDetailAiExplanationReasonsItem = {
@@ -115,6 +127,15 @@ export type NewsDetail = NewsCard & {
   claims: NewsDetailClaimsItem[];
 };
 
+export type SubmitNewsInputRumorVerdict =
+  (typeof SubmitNewsInputRumorVerdict)[keyof typeof SubmitNewsInputRumorVerdict];
+
+export const SubmitNewsInputRumorVerdict = {
+  false_rumor: "false_rumor",
+  true_claim: "true_claim",
+  partly_true: "partly_true",
+} as const;
+
 export interface SubmitNewsInput {
   /** @minLength 8 */
   title: string;
@@ -125,6 +146,9 @@ export interface SubmitNewsInput {
   mediaUrl?: string;
   category?: string;
   location?: string;
+  isRumorCheck?: boolean;
+  rumorClaim?: string;
+  rumorVerdict?: SubmitNewsInputRumorVerdict;
 }
 
 export type VerificationStageStatus =

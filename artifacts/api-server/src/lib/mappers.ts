@@ -55,6 +55,12 @@ export function sourceFull(s: Source) {
   };
 }
 
+type RumorVerdict = "false_rumor" | "true_claim" | "partly_true";
+function asRumorVerdict(v: string | null): RumorVerdict | undefined {
+  if (v === "false_rumor" || v === "true_claim" || v === "partly_true") return v;
+  return undefined;
+}
+
 export function newsCard(n: News, author: User, sourcesCount: number) {
   return {
     id: n.id,
@@ -74,6 +80,9 @@ export function newsCard(n: News, author: User, sourcesCount: number) {
       comments: n.comments,
       shares: n.shares,
     },
+    isRumorCheck: n.isRumorCheck,
+    rumorClaim: n.rumorClaim ?? undefined,
+    rumorVerdict: asRumorVerdict(n.rumorVerdict),
   };
 }
 

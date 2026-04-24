@@ -3,7 +3,7 @@ import { formatTimeAgo, formatCompactArabicNumber } from "@/lib/format";
 import { NewsCard as NewsCardType } from "@workspace/api-client-react";
 import { StatusBadge } from "./status-badge";
 import { ConfidenceBar } from "./confidence-bar";
-import { MessageSquare, Share2, ThumbsUp, ShieldCheck } from "lucide-react";
+import { MessageSquare, Share2, ThumbsUp, ShieldCheck, ShieldAlert, ShieldX } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -37,9 +37,35 @@ export function NewsCard({ news, className }: NewsCardProps) {
             <StatusBadge status={news.status} />
           </div>
 
+          {news.isRumorCheck && (
+            <div className="flex items-center gap-2 text-[11px] font-semibold tracking-wide uppercase text-rose-700 dark:text-rose-300">
+              {news.rumorVerdict === "true_claim" ? (
+                <ShieldCheck className="w-3.5 h-3.5" />
+              ) : news.rumorVerdict === "partly_true" ? (
+                <ShieldAlert className="w-3.5 h-3.5" />
+              ) : (
+                <ShieldX className="w-3.5 h-3.5" />
+              )}
+              <span>
+                تفنيد إشاعة ·{" "}
+                {news.rumorVerdict === "true_claim"
+                  ? "تبيّن أنها صحيحة"
+                  : news.rumorVerdict === "partly_true"
+                    ? "صحيحة جزئياً"
+                    : "إشاعة كاذبة"}
+              </span>
+            </div>
+          )}
+
           <h3 className="font-bold text-lg leading-tight line-clamp-2">
             {news.title}
           </h3>
+
+          {news.isRumorCheck && news.rumorClaim && (
+            <blockquote className="border-r-2 border-rose-300/70 dark:border-rose-500/50 bg-rose-50/60 dark:bg-rose-950/20 pr-3 py-2 text-xs text-muted-foreground line-clamp-2 italic">
+              «{news.rumorClaim}»
+            </blockquote>
+          )}
 
           <p className="text-muted-foreground text-sm line-clamp-2">
             {news.summary}

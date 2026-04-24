@@ -5,6 +5,7 @@ import {
   doublePrecision,
   timestamp,
   jsonb,
+  boolean,
 } from "drizzle-orm/pg-core";
 
 export type AiExplanation = {
@@ -42,6 +43,9 @@ export const newsTable = pgTable("news", {
   likes: integer("likes").notNull().default(0),
   comments: integer("comments").notNull().default(0),
   shares: integer("shares").notNull().default(0),
+  isRumorCheck: boolean("is_rumor_check").notNull().default(false),
+  rumorClaim: text("rumor_claim"),
+  rumorVerdict: text("rumor_verdict"),
 });
 
 export const newsSourcesTable = pgTable("news_sources", {

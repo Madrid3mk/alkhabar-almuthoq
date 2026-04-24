@@ -5,6 +5,7 @@
  * News verification platform API
  * OpenAPI spec version: 0.1.0
  */
+import type { SubmitNewsInputRumorVerdict } from "./submitNewsInputRumorVerdict";
 
 export interface SubmitNewsInput {
   /** @minLength 8 */
@@ -16,4 +17,7 @@ export interface SubmitNewsInput {
   mediaUrl?: string;
   category?: string;
   location?: string;
+  isRumorCheck?: boolean;
+  rumorClaim?: string;
+  rumorVerdict?: SubmitNewsInputRumorVerdict;
 }

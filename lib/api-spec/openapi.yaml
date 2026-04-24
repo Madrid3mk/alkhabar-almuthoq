@@ -433,6 +433,13 @@ components:
               type: integer
             shares:
               type: integer
+        isRumorCheck:
+          type: boolean
+        rumorClaim:
+          type: string
+        rumorVerdict:
+          type: string
+          enum: [false_rumor, true_claim, partly_true]
 
     NewsDetail:
       allOf:
@@ -494,6 +501,13 @@ components:
           type: string
         location:
           type: string
+        isRumorCheck:
+          type: boolean
+        rumorClaim:
+          type: string
+        rumorVerdict:
+          type: string
+          enum: [false_rumor, true_claim, partly_true]
 
     VerificationStage:
       type: object

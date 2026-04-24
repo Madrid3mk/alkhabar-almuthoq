@@ -7,6 +7,7 @@
  */
 import type { AuthorMini } from "./authorMini";
 import type { Confidence } from "./confidence";
+import type { NewsCardRumorVerdict } from "./newsCardRumorVerdict";
 import type { NewsCardStats } from "./newsCardStats";
 import type { NewsStatus } from "./newsStatus";
 
@@ -24,4 +25,7 @@ export interface NewsCard {
   author: AuthorMini;
   sourcesCount: number;
   stats: NewsCardStats;
+  isRumorCheck?: boolean;
+  rumorClaim?: string;
+  rumorVerdict?: NewsCardRumorVerdict;
 }

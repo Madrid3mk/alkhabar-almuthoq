@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, Plus, X, Upload } from "lucide-react";
+import { AlertCircle, Plus, X, Upload, ShieldX } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Submit() {
@@ -18,6 +18,11 @@ export default function Submit() {
   const [category, setCategory] = useState("");
   const [sourceUrls, setSourceUrls] = useState<string[]>([""]);
   const [mediaUrl, setMediaUrl] = useState("");
+  const [isRumorCheck, setIsRumorCheck] = useState(false);
+  const [rumorClaim, setRumorClaim] = useState("");
+  const [rumorVerdict, setRumorVerdict] = useState<
+    "false_rumor" | "true_claim" | "partly_true"
+  >("false_rumor");
   
   const submitMutation = useSubmitNews({
     mutation: {
@@ -70,13 +75,25 @@ export default function Submit() {
       return;
     }
     
+    if (isRumorCheck && rumorClaim.trim().length === 0) {
+      toast({
+        title: "نص الإشاعة مفقود",
+        description: "يجب كتابة نص الإشاعة التي يفنّدها هذا الخبر.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     submitMutation.mutate({
       data: {
         title,
         body,
         sourceUrls: validSources,
         category: category || undefined,
-        mediaUrl: mediaUrl || undefined
+        mediaUrl: mediaUrl || undefined,
+        isRumorCheck: isRumorCheck || undefined,
+        rumorClaim: isRumorCheck ? rumorClaim : undefined,
+        rumorVerdict: isRumorCheck ? rumorVerdict : undefined,
       }
     });
   };
@@ -99,10 +116,72 @@ export default function Submit() {
           <li>لا مصدر = لا نشر (يجب إرفاق روابط للمصادر)</li>
           <li>صياغة رأي = رفض (الخبر يجب أن يكون موضوعياً)</li>
           <li>يجب أن يكون العنوان دقيقاً وغير مضلل</li>
+          <li>تفنيد الإشاعات بمصادر موثّقة يحصل على تقييم ثقة أعلى</li>
         </ul>
       </Card>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <Card className="p-4 flex flex-col gap-3 border-dashed">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={isRumorCheck}
+              onChange={(e) => setIsRumorCheck(e.target.checked)}
+              className="mt-1 w-4 h-4 accent-rose-600"
+            />
+            <div className="flex-1">
+              <div className="flex items-center gap-2 font-semibold">
+                <ShieldX className="w-4 h-4 text-rose-600" />
+                هذا الخبر يفنّد إشاعة منتشرة
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                مثال: "إشاعة أن الحكومة الأردنية حوّلت التعليم إلى عن بُعد — والإشاعة كاذبة." سيُعامَل تفنيدك كخبر صحيح ويحصل على تقييم ثقة أعلى عند توفر مصادر رسمية.
+              </p>
+            </div>
+          </label>
+          {isRumorCheck && (
+            <div className="flex flex-col gap-3 pt-2 border-t border-border">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="rumor-claim">نص الإشاعة المتداولة</Label>
+                <Textarea
+                  id="rumor-claim"
+                  placeholder="اكتب نص الإشاعة كما تنتشر تماماً، حتى يفهم القارئ ما يجري تفنيده..."
+                  value={rumorClaim}
+                  onChange={(e) => setRumorClaim(e.target.value)}
+                  className="min-h-[80px]"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label>حكم التحقق على الإشاعة</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { v: "false_rumor", label: "كاذبة", color: "rose" },
+                    { v: "partly_true", label: "صحيحة جزئياً", color: "amber" },
+                    { v: "true_claim", label: "صحيحة فعلاً", color: "emerald" },
+                  ].map((opt) => (
+                    <button
+                      key={opt.v}
+                      type="button"
+                      onClick={() => setRumorVerdict(opt.v as typeof rumorVerdict)}
+                      className={`text-sm py-2 rounded-md border transition-colors ${
+                        rumorVerdict === opt.v
+                          ? opt.color === "rose"
+                            ? "bg-rose-600 text-white border-rose-600"
+                            : opt.color === "amber"
+                              ? "bg-amber-500 text-white border-amber-500"
+                              : "bg-emerald-600 text-white border-emerald-600"
+                          : "bg-background hover:bg-muted border-border"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </Card>
+
         <div className="flex flex-col gap-3">
           <Label htmlFor="title">عنوان الخبر</Label>
           <Input 

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ShieldCheck, Share2, ThumbsUp, MessageSquare, ArrowRight, ExternalLink, Info, CheckCircle2, XCircle } from "lucide-react";
+import { ShieldCheck, Share2, ThumbsUp, MessageSquare, ArrowRight, ExternalLink, Info, CheckCircle2, XCircle, ShieldAlert, ShieldX } from "lucide-react";
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
 
@@ -106,6 +106,75 @@ export default function NewsDetail({ id }: { id: string }) {
             alt={news.title} 
             className="w-full h-full object-cover" 
           />
+        </div>
+      )}
+
+      {news.isRumorCheck && (
+        <div
+          className={cn(
+            "rounded-xl border p-5 flex flex-col gap-4",
+            news.rumorVerdict === "true_claim"
+              ? "bg-emerald-50/70 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900"
+              : news.rumorVerdict === "partly_true"
+                ? "bg-amber-50/70 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900"
+                : "bg-rose-50/70 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900",
+          )}
+        >
+          <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide">
+            {news.rumorVerdict === "true_claim" ? (
+              <ShieldCheck className="w-5 h-5 text-emerald-700 dark:text-emerald-300" />
+            ) : news.rumorVerdict === "partly_true" ? (
+              <ShieldAlert className="w-5 h-5 text-amber-700 dark:text-amber-300" />
+            ) : (
+              <ShieldX className="w-5 h-5 text-rose-700 dark:text-rose-300" />
+            )}
+            <span
+              className={cn(
+                news.rumorVerdict === "true_claim"
+                  ? "text-emerald-800 dark:text-emerald-200"
+                  : news.rumorVerdict === "partly_true"
+                    ? "text-amber-800 dark:text-amber-200"
+                    : "text-rose-800 dark:text-rose-200",
+              )}
+            >
+              تفنيد إشاعة
+            </span>
+          </div>
+
+          {news.rumorClaim && (
+            <div className="flex flex-col gap-2">
+              <div className="text-xs text-muted-foreground font-semibold">
+                الإشاعة المتداولة
+              </div>
+              <blockquote className="text-base leading-relaxed border-r-4 border-muted-foreground/30 pr-3 italic">
+                «{news.rumorClaim}»
+              </blockquote>
+            </div>
+          )}
+
+          <div className="flex flex-col gap-2">
+            <div className="text-xs text-muted-foreground font-semibold">
+              الحكم بعد التحقق
+            </div>
+            <div className="flex items-center gap-2 text-base font-semibold">
+              {news.rumorVerdict === "true_claim" ? (
+                <>
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                  <span>تبيّن أن ما يُعدّ إشاعة هو خبر صحيح فعلاً</span>
+                </>
+              ) : news.rumorVerdict === "partly_true" ? (
+                <>
+                  <ShieldAlert className="w-5 h-5 text-amber-600" />
+                  <span>الإشاعة صحيحة جزئياً وفقاً للمصادر</span>
+                </>
+              ) : (
+                <>
+                  <XCircle className="w-5 h-5 text-rose-600" />
+                  <span>الإشاعة كاذبة، وقد فنّدتها المصادر الرسمية</span>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       )}
 

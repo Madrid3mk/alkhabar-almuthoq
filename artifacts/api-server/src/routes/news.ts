@@ -137,7 +137,10 @@ router.post("/news", async (req, res) => {
   const id = `news_${Date.now()}`;
   const now = new Date();
   const sourceCount = body.sourceUrls.length;
-  const confidenceScore = Math.min(95, 60 + sourceCount * 8);
+  // Rumor-debunking that backs its verdict with sources earns a boost — the
+  // platform values verified critique of misinformation.
+  const rumorBoost = body.isRumorCheck && sourceCount >= 1 ? 15 : 0;
+  const confidenceScore = Math.min(98, 60 + sourceCount * 8 + rumorBoost);
   const confidence: "high" | "medium" | "low" =
     confidenceScore >= 80 ? "high" : confidenceScore >= 60 ? "medium" : "low";
 
@@ -157,27 +160,45 @@ router.post("/news", async (req, res) => {
     })
     .filter((s): s is Source => !!s);
 
-  const aiExplanation = {
-    verdict:
-      "تم تحليل الخبر وفحص المصادر آلياً. سيتم تحديث التصنيف بعد إكمال جميع المراحل.",
-    reasons: [
-      {
-        text: `تم العثور على ${matched.length} مصدر معروف في النظام`,
-        ok: matched.length > 0,
-      },
-      {
-        text:
-          sourceCount >= 3
-            ? "عدد كاف من المصادر"
-            : "عدد المصادر أقل من الموصى به (3+)",
-        ok: sourceCount >= 3,
-      },
-      {
-        text: "تم اعتبار صياغة النص خبرية",
-        ok: true,
-      },
-    ],
-  };
+  const baseReasons = [
+    {
+      text: `تم العثور على ${matched.length} مصدر معروف في النظام`,
+      ok: matched.length > 0,
+    },
+    {
+      text:
+        sourceCount >= 3
+          ? "عدد كاف من المصادر"
+          : "عدد المصادر أقل من الموصى به (3+)",
+      ok: sourceCount >= 3,
+    },
+    {
+      text: "تم اعتبار صياغة النص خبرية",
+      ok: true,
+    },
+  ];
+  const aiExplanation = body.isRumorCheck
+    ? {
+        verdict:
+          "خبر تفنيد إشاعة. تم تقييم صحة التفنيد ومصادره.",
+        reasons: [
+          {
+            text:
+              body.rumorVerdict === "false_rumor"
+                ? "الإشاعة مفنّدة بشكل صحيح وفقاً للمصادر"
+                : body.rumorVerdict === "true_claim"
+                  ? "تبيّن أن ما يُعدّ إشاعة هو في الواقع خبر صحيح"
+                  : "تبيّن أن الإشاعة صحيحة جزئياً",
+            ok: true,
+          },
+          ...baseReasons,
+        ],
+      }
+    : {
+        verdict:
+          "تم تحليل الخبر وفحص المصادر آلياً. سيتم تحديث التصنيف بعد إكمال جميع المراحل.",
+        reasons: baseReasons,
+      };
 
   await db.insert(newsTable).values({
     id,
@@ -188,7 +209,7 @@ router.post("/news", async (req, res) => {
     status: "verifying",
     confidence,
     confidenceScore,
-    category: body.category ?? "عام",
+    category: body.isRumorCheck ? "تفنيد إشاعة" : body.category ?? "عام",
     location: body.location ?? null,
     authorId: ME_USER_ID,
     publishedAt: now,
@@ -199,6 +220,9 @@ router.post("/news", async (req, res) => {
     likes: 0,
     comments: 0,
     shares: 0,
+    isRumorCheck: body.isRumorCheck ?? false,
+    rumorClaim: body.rumorClaim ?? null,
+    rumorVerdict: body.rumorVerdict ?? null,
   });
 
   let nsCounter = Date.now();

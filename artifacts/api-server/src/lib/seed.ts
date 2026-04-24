@@ -375,6 +375,48 @@ export async function ensureSeed(): Promise<void> {
       shares: 4,
     },
     {
+      id: id("news", 8),
+      title: "تفنيد إشاعة: الحكومة الأردنية لم تُحوّل التعليم إلى تعليم عن بُعد",
+      summary:
+        "إشاعة منتشرة تدّعي تحويل المدارس والجامعات في الأردن إلى التعليم عن بُعد، وقد فنّدتها وزارة التربية والتعليم رسمياً.",
+      body: "انتشرت في الساعات الأخيرة إشاعة على وسائل التواصل تدّعي أن الحكومة الأردنية قررت تحويل التعليم في المدارس والجامعات إلى تعليم عن بُعد بدءاً من الأسبوع القادم. وقد نفت وزارة التربية والتعليم الأردنية هذا الادعاء في بيان رسمي، مؤكدةً أن الدوام يسير بشكل اعتيادي وأنه لا توجد أي قرارات بهذا الشأن. كما أكدت وزارة التعليم العالي للجامعات أن لا تغيير في نمط الدراسة.",
+      imageUrl: null,
+      status: "verified",
+      confidence: "high",
+      confidenceScore: 94,
+      category: "تفنيد إشاعة",
+      location: "عمّان",
+      authorId: id("user", 2),
+      publishedAt: minutes(35),
+      verificationStartedAt: minutes(40),
+      verificationDurationSeconds: 90,
+      aiExplanation: {
+        verdict:
+          "تم تأكيد أن الادعاء المتداول إشاعة غير صحيحة، وفقاً لبيانات رسمية من الوزارة المعنية.",
+        reasons: [
+          { text: "تكذيب رسمي من وزارة التربية والتعليم", ok: true },
+          { text: "تأكيد من وزارة التعليم العالي", ok: true },
+          { text: "لا يوجد أي مصدر رسمي يدعم الإشاعة", ok: true },
+          { text: "تغطية متعددة من مصادر إخبارية موثوقة", ok: true },
+        ],
+      },
+      claims: [
+        {
+          text: "الادعاء بتحويل التعليم إلى تعليم عن بُعد",
+          supported: false,
+        },
+        { text: "تكذيب وزارة التربية للإشاعة", supported: true },
+        { text: "تأكيد استمرار الدوام الاعتيادي", supported: true },
+      ],
+      likes: 1840,
+      comments: 312,
+      shares: 720,
+      isRumorCheck: true,
+      rumorClaim:
+        "الحكومة الأردنية قررت تحويل التعليم في المدارس والجامعات إلى تعليم عن بُعد بدءاً من الأسبوع القادم.",
+      rumorVerdict: "false_rumor",
+    },
+    {
       id: id("news", 7),
       title: "بدء التسجيل في موسم الرياض 2026 وفعاليات جديدة كلياً",
       summary: "إعلان رسمي عن انطلاق موسم الرياض الجديد بفعاليات موسعة.",
@@ -420,6 +462,7 @@ export async function ensureSeed(): Promise<void> {
   link(id("news", 5), [id("src", 3), id("src", 4), id("src", 5)]);
   link(id("news", 6), [id("src", 3)]);
   link(id("news", 7), [id("src", 3), id("src", 5), id("src", 4)]);
+  link(id("news", 8), [id("src", 3), id("src", 1), id("src", 2), id("src", 7)]);
   await db.insert(newsSourcesTable).values(ns);
 
   const comments = [

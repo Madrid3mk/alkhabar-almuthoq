@@ -50,6 +50,11 @@ export const ListNewsResponseItem = zod.object({
     comments: zod.number(),
     shares: zod.number(),
   }),
+  isRumorCheck: zod.boolean().optional(),
+  rumorClaim: zod.string().optional(),
+  rumorVerdict: zod
+    .enum(["false_rumor", "true_claim", "partly_true"])
+    .optional(),
 });
 export const ListNewsResponse = zod.array(ListNewsResponseItem);
 
@@ -67,6 +72,11 @@ export const SubmitNewsBody = zod.object({
   mediaUrl: zod.string().optional(),
   category: zod.string().optional(),
   location: zod.string().optional(),
+  isRumorCheck: zod.boolean().optional(),
+  rumorClaim: zod.string().optional(),
+  rumorVerdict: zod
+    .enum(["false_rumor", "true_claim", "partly_true"])
+    .optional(),
 });
 
 /**
@@ -102,6 +112,11 @@ export const GetNewsResponse = zod
       comments: zod.number(),
       shares: zod.number(),
     }),
+    isRumorCheck: zod.boolean().optional(),
+    rumorClaim: zod.string().optional(),
+    rumorVerdict: zod
+      .enum(["false_rumor", "true_claim", "partly_true"])
+      .optional(),
   })
   .and(
     zod.object({
@@ -276,6 +291,11 @@ export const GetSourceResponse = zod
             comments: zod.number(),
             shares: zod.number(),
           }),
+          isRumorCheck: zod.boolean().optional(),
+          rumorClaim: zod.string().optional(),
+          rumorVerdict: zod
+            .enum(["false_rumor", "true_claim", "partly_true"])
+            .optional(),
         }),
       ),
       relatedSources: zod
@@ -398,6 +418,11 @@ export const GetUserNewsResponseItem = zod.object({
     comments: zod.number(),
     shares: zod.number(),
   }),
+  isRumorCheck: zod.boolean().optional(),
+  rumorClaim: zod.string().optional(),
+  rumorVerdict: zod
+    .enum(["false_rumor", "true_claim", "partly_true"])
+    .optional(),
 });
 export const GetUserNewsResponse = zod.array(GetUserNewsResponseItem);
 
@@ -470,5 +495,10 @@ export const GetTrendingNewsResponseItem = zod.object({
     comments: zod.number(),
     shares: zod.number(),
   }),
+  isRumorCheck: zod.boolean().optional(),
+  rumorClaim: zod.string().optional(),
+  rumorVerdict: zod
+    .enum(["false_rumor", "true_claim", "partly_true"])
+    .optional(),
 });
 export const GetTrendingNewsResponse = zod.array(GetTrendingNewsResponseItem);
