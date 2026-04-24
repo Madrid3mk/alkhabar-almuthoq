@@ -51,7 +51,8 @@ export const newsTable = pgTable("news", {
 export const newsSourcesTable = pgTable("news_sources", {
   id: text("id").primaryKey(),
   newsId: text("news_id").notNull(),
-  sourceId: text("source_id").notNull(),
+  sourceId: text("source_id"),
+  url: text("url").notNull().default(""),
 });
 
 export type News = typeof newsTable.$inferSelect;

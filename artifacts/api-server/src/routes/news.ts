@@ -55,21 +55,31 @@ async function loadSourceCounts(
   return new Map(rows.map((r) => [r.newsId, r.c]));
 }
 
-async function loadSourcesFor(newsId: string): Promise<Source[]> {
+async function loadCitationsFor(
+  newsId: string,
+): Promise<{ url: string; source?: Source }[]> {
   const links = await db
-    .select({ sourceId: newsSourcesTable.sourceId })
+    .select({
+      sourceId: newsSourcesTable.sourceId,
+      url: newsSourcesTable.url,
+    })
     .from(newsSourcesTable)
     .where(eq(newsSourcesTable.newsId, newsId));
   if (links.length === 0) return [];
-  return db
-    .select()
-    .from(sourcesTable)
-    .where(
-      inArray(
-        sourcesTable.id,
-        links.map((l) => l.sourceId),
-      ),
-    );
+  const sourceIds = links
+    .map((l) => l.sourceId)
+    .filter((s): s is string => !!s);
+  const sources = sourceIds.length
+    ? await db
+        .select()
+        .from(sourcesTable)
+        .where(inArray(sourcesTable.id, sourceIds))
+    : [];
+  const byId = new Map(sources.map((s) => [s.id, s]));
+  return links.map((l) => ({
+    url: l.url,
+    source: l.sourceId ? byId.get(l.sourceId) : undefined,
+  }));
 }
 
 router.get("/news", async (req, res) => {
@@ -144,20 +154,30 @@ router.post("/news", async (req, res) => {
   const confidence: "high" | "medium" | "low" =
     confidenceScore >= 80 ? "high" : confidenceScore >= 60 ? "medium" : "low";
 
-  // Try matching submitted URLs to known sources by hostname
+  // Try matching submitted URLs to known sources by hostname. Every submitted
+  // URL is preserved as a citation regardless of whether we recognize the
+  // source entity — readers should see what the author actually cited.
   const allSources = await db.select().from(sourcesTable);
-  const matched = body.sourceUrls
-    .map((u) => {
-      try {
-        const host = new URL(u).hostname.replace(/^www\./, "");
-        return allSources.find((s) => {
-          const sh = new URL(s.url).hostname.replace(/^www\./, "");
-          return sh === host;
-        });
-      } catch {
-        return undefined;
-      }
-    })
+  const submittedCitations = body.sourceUrls.map((u) => {
+    let host: string | undefined;
+    try {
+      host = new URL(u).hostname.replace(/^www\./, "");
+    } catch {
+      host = undefined;
+    }
+    const match = host
+      ? allSources.find((s) => {
+          try {
+            return new URL(s.url).hostname.replace(/^www\./, "") === host;
+          } catch {
+            return false;
+          }
+        })
+      : undefined;
+    return { url: u, source: match };
+  });
+  const matched = submittedCitations
+    .map((c) => c.source)
     .filter((s): s is Source => !!s);
 
   const baseReasons = [
@@ -226,12 +246,13 @@ router.post("/news", async (req, res) => {
   });
 
   let nsCounter = Date.now();
-  if (matched.length > 0) {
+  if (submittedCitations.length > 0) {
     await db.insert(newsSourcesTable).values(
-      matched.map((s) => ({
+      submittedCitations.map((c) => ({
         id: `ns_${nsCounter++}`,
         newsId: id,
-        sourceId: s.id,
+        sourceId: c.source?.id ?? null,
+        url: c.url,
       })),
     );
   }
@@ -252,8 +273,8 @@ router.post("/news", async (req, res) => {
     res.status(500).json({ error: "Author not found" });
     return;
   }
-  const sources = await loadSourcesFor(id);
-  res.status(201).json(newsDetail(created, author, sources));
+  const citations = await loadCitationsFor(id);
+  res.status(201).json(newsDetail(created, author, citations));
 });
 
 router.get("/news/:id", async (req, res) => {
@@ -271,8 +292,8 @@ router.get("/news/:id", async (req, res) => {
     res.status(404).json({ error: "Author not found" });
     return;
   }
-  const sources = await loadSourcesFor(id);
-  res.json(newsDetail(n, author, sources));
+  const citations = await loadCitationsFor(id);
+  res.json(newsDetail(n, author, citations));
 });
 
 router.get("/news/:id/verification", async (req, res) => {

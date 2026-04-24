@@ -448,21 +448,66 @@ export async function ensureSeed(): Promise<void> {
   ];
   await db.insert(newsTable).values(news);
 
-  const ns: { id: string; newsId: string; sourceId: string }[] = [];
+  const ns: {
+    id: string;
+    newsId: string;
+    sourceId: string | null;
+    url: string;
+  }[] = [];
   let nsCounter = 1;
-  function link(newsId: string, sourceIds: string[]) {
-    for (const s of sourceIds) {
-      ns.push({ id: id("ns", nsCounter++), newsId, sourceId: s });
+  function link(
+    newsId: string,
+    items: Array<{ sourceId: string | null; url: string }>,
+  ) {
+    for (const it of items) {
+      ns.push({
+        id: id("ns", nsCounter++),
+        newsId,
+        sourceId: it.sourceId,
+        url: it.url,
+      });
     }
   }
-  link(id("news", 1), [id("src", 6), id("src", 3), id("src", 5), id("src", 4)]);
-  link(id("news", 2), [id("src", 4), id("src", 2)]);
-  link(id("news", 3), [id("src", 6), id("src", 3), id("src", 1), id("src", 7)]);
-  link(id("news", 4), [id("src", 1), id("src", 7), id("src", 8)]);
-  link(id("news", 5), [id("src", 3), id("src", 4), id("src", 5)]);
-  link(id("news", 6), [id("src", 3)]);
-  link(id("news", 7), [id("src", 3), id("src", 5), id("src", 4)]);
-  link(id("news", 8), [id("src", 3), id("src", 1), id("src", 2), id("src", 7)]);
+  link(id("news", 1), [
+    { sourceId: id("src", 6), url: "https://moh.gov.sa/news/jeddah-warehouse-2026-04-24" },
+    { sourceId: id("src", 3), url: "https://spa.gov.sa/2026/jeddah-fire-incident" },
+    { sourceId: id("src", 5), url: "https://ekhbariya.net/articles/jeddah-warehouse-fire" },
+    { sourceId: id("src", 4), url: "https://okaz.com.sa/article/2114567/jeddah-fire" },
+  ]);
+  link(id("news", 2), [
+    { sourceId: id("src", 4), url: "https://okaz.com.sa/article/2114890/heatwave-warning" },
+    { sourceId: id("src", 2), url: "https://alarabiya.net/weather/2026/04/24/gulf-heatwave-forecast" },
+  ]);
+  link(id("news", 3), [
+    { sourceId: id("src", 6), url: "https://moh.gov.sa/announcements/new-vaccine-clinical-trials" },
+    { sourceId: id("src", 3), url: "https://spa.gov.sa/2026/health/vaccine-discovery" },
+    { sourceId: id("src", 1), url: "https://reuters.com/health/saudi-vaccine-discovery-2026-04-24" },
+    { sourceId: id("src", 7), url: "https://apnews.com/article/saudi-arabia-vaccine-trials-2026" },
+  ]);
+  link(id("news", 4), [
+    { sourceId: id("src", 1), url: "https://reuters.com/markets/oil-prices-surge-2026-04-23" },
+    { sourceId: id("src", 7), url: "https://apnews.com/article/oil-prices-global-markets" },
+    { sourceId: id("src", 8), url: "https://bloomberg.com/news/articles/2026-04-23/oil-supply-update" },
+  ]);
+  link(id("news", 5), [
+    { sourceId: id("src", 3), url: "https://spa.gov.sa/2026/sports/al-hilal-victory" },
+    { sourceId: id("src", 4), url: "https://okaz.com.sa/article/2115012/al-hilal-match-report" },
+    { sourceId: id("src", 5), url: "https://ekhbariya.net/sports/al-hilal-asia-final" },
+  ]);
+  link(id("news", 6), [
+    { sourceId: id("src", 3), url: "https://spa.gov.sa/2026/clarification-statement" },
+  ]);
+  link(id("news", 7), [
+    { sourceId: id("src", 3), url: "https://spa.gov.sa/2026/entertainment/riyadh-season-2026" },
+    { sourceId: id("src", 5), url: "https://ekhbariya.net/entertainment/riyadh-season-launch" },
+    { sourceId: id("src", 4), url: "https://okaz.com.sa/article/2115423/riyadh-season-2026" },
+  ]);
+  link(id("news", 8), [
+    { sourceId: null, url: "https://www.moe.gov.jo/ar/news/2026/04/clarification-no-remote-learning" },
+    { sourceId: id("src", 1), url: "https://reuters.com/world/middle-east/jordan-education-rumor-debunked-2026-04-24" },
+    { sourceId: id("src", 2), url: "https://alarabiya.net/north-africa/jordan/2026/04/24/jordan-education-clarification" },
+    { sourceId: id("src", 7), url: "https://apnews.com/article/jordan-education-ministry-statement-2026" },
+  ]);
   await db.insert(newsSourcesTable).values(ns);
 
   const comments = [

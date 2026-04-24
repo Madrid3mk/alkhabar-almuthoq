@@ -208,38 +208,81 @@ export default function NewsDetail({ id }: { id: string }) {
         ))}
       </div>
 
-      {/* Sources Section */}
-      {news.sources && news.sources.length > 0 && (
+      {/* Sources Section — every URL the author submitted, shown as-is */}
+      {news.citations && news.citations.length > 0 && (
         <div className="flex flex-col gap-4 mt-4">
-          <h3 className="text-xl font-bold flex items-center gap-2">
-            المصادر المرجعية ({news.sourcesCount})
-          </h3>
+          <div className="flex items-baseline justify-between">
+            <h3 className="text-xl font-bold flex items-center gap-2">
+              المصادر المرجعية ({news.sourcesCount})
+            </h3>
+            <span className="text-xs text-muted-foreground">
+              اضغط على أي مصدر لفتح الرابط الأصلي
+            </span>
+          </div>
           <div className="flex flex-col gap-3">
-            {news.sources.map((source) => (
-              <Link key={source.id} href={`/sources/${source.id}`}>
-                <div className="flex items-center justify-between p-4 border border-border rounded-lg hover:border-primary/50 transition-colors bg-card hover-elevate">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded bg-muted flex items-center justify-center font-bold text-muted-foreground border border-border">
-                      {source.name.substring(0, 1)}
-                    </div>
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-1">
-                        <span className="font-medium">{source.name}</span>
-                        {source.verified && <ShieldCheck className="w-3.5 h-3.5 text-trust-blue" />}
+            {news.citations.map((c, idx) => {
+              const src = c.source;
+              const initial = src ? src.name.substring(0, 1) : (c.domain ?? "?").substring(0, 1).toUpperCase();
+              return (
+                <div
+                  key={`${c.url}-${idx}`}
+                  className="flex flex-col gap-3 p-4 border border-border rounded-lg bg-card hover:border-primary/40 transition-colors"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className={cn(
+                        "w-10 h-10 rounded flex items-center justify-center font-bold border shrink-0",
+                        src ? "bg-muted text-muted-foreground border-border" : "bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-900"
+                      )}>
+                        {initial}
                       </div>
-                      <span className="text-xs text-muted-foreground">{source.type}</span>
+                      <div className="flex flex-col min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {src ? (
+                            <Link href={`/sources/${src.id}`} className="font-medium hover:text-primary transition-colors">
+                              {src.name}
+                            </Link>
+                          ) : (
+                            <span className="font-medium text-foreground">{c.domain ?? "مصدر غير معرّف"}</span>
+                          )}
+                          {src?.verified && <ShieldCheck className="w-3.5 h-3.5 text-trust-blue" />}
+                          {!src && (
+                            <span className="text-[10px] uppercase tracking-wide bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 px-1.5 py-0.5 rounded">
+                              مصدر غير مُسجَّل
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-xs text-muted-foreground truncate">
+                          {src ? src.type : c.domain}
+                        </span>
+                      </div>
                     </div>
+                    {src && (
+                      <div className="flex flex-col items-end gap-0.5 shrink-0">
+                        <span className="text-[10px] text-muted-foreground">درجة الدقة</span>
+                        <span className="text-sm font-bold">{src.score}%</span>
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="flex flex-col items-end gap-1">
-                      <span className="text-xs text-muted-foreground">درجة الدقة</span>
-                      <span className="text-sm font-bold">{source.score}%</span>
-                    </div>
-                    <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                  </div>
+
+                  <a
+                    href={c.url}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="flex items-center justify-between gap-2 px-3 py-2 rounded-md bg-muted/40 border border-border/60 text-xs hover:bg-muted hover:border-primary/40 transition-colors group"
+                    dir="ltr"
+                  >
+                    <span className="truncate text-muted-foreground group-hover:text-foreground transition-colors">
+                      {c.url}
+                    </span>
+                    <span className="flex items-center gap-1 text-primary font-medium shrink-0" dir="rtl">
+                      <span>تفقّد المصدر</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </span>
+                  </a>
                 </div>
-              </Link>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

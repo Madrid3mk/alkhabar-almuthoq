@@ -86,15 +86,40 @@ export function newsCard(n: News, author: User, sourcesCount: number) {
   };
 }
 
+export type CitationInput = {
+  url: string;
+  source?: Source | null;
+};
+
+function safeHostname(u: string): string | undefined {
+  try {
+    return new URL(u).hostname.replace(/^www\./, "");
+  } catch {
+    return undefined;
+  }
+}
+
+export function citationDto(c: CitationInput) {
+  return {
+    url: c.url,
+    source: c.source ? sourceMini(c.source) : undefined,
+    domain: safeHostname(c.url),
+  };
+}
+
 export function newsDetail(
   n: News,
   author: User,
-  sources: Source[],
+  citations: CitationInput[],
 ) {
+  const matchedSources = citations
+    .map((c) => c.source)
+    .filter((s): s is Source => !!s);
   return {
-    ...newsCard(n, author, sources.length),
+    ...newsCard(n, author, citations.length),
     body: n.body,
-    sources: sources.map(sourceMini),
+    sources: matchedSources.map(sourceMini),
+    citations: citations.map(citationDto),
     aiExplanation: n.aiExplanation,
     claims: n.claims ?? [],
   };

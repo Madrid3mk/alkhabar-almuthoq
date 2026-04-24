@@ -121,22 +121,65 @@ export const GetNewsResponse = zod
   .and(
     zod.object({
       body: zod.string(),
-      sources: zod.array(
-        zod.object({
-          id: zod.string(),
-          name: zod.string(),
-          url: zod.string(),
-          score: zod.number(),
-          type: zod.enum([
-            "news_agency",
-            "newspaper",
-            "tv_channel",
-            "website",
-            "official",
-          ]),
-          verified: zod.boolean().optional(),
-        }),
-      ),
+      sources: zod
+        .array(
+          zod.object({
+            id: zod.string(),
+            name: zod.string(),
+            url: zod.string(),
+            score: zod.number(),
+            type: zod.enum([
+              "news_agency",
+              "newspaper",
+              "tv_channel",
+              "website",
+              "official",
+            ]),
+            verified: zod.boolean().optional(),
+          }),
+        )
+        .describe(
+          "Deprecated convenience list of matched source entities. Prefer `citations` to display the exact URLs submitted by the author.",
+        ),
+      citations: zod
+        .array(
+          zod.object({
+            url: zod
+              .string()
+              .describe(
+                "The exact URL the news author submitted as evidence (article, study, or official statement).",
+              ),
+            source: zod
+              .object({
+                id: zod.string(),
+                name: zod.string(),
+                url: zod.string(),
+                score: zod.number(),
+                type: zod.enum([
+                  "news_agency",
+                  "newspaper",
+                  "tv_channel",
+                  "website",
+                  "official",
+                ]),
+                verified: zod.boolean().optional(),
+              })
+              .optional()
+              .describe(
+                "The matched source entity, when the URL belongs to a recognized publication.",
+              ),
+            domain: zod
+              .string()
+              .optional()
+              .describe(
+                "The hostname of the URL, useful for showing readers where the citation comes from when no entity match exists.",
+              ),
+          }),
+        )
+        .optional()
+        .describe(
+          "One entry per URL submitted by the author, with the source entity attached if recognized.",
+        ),
       aiExplanation: zod.object({
         verdict: zod.string(),
         reasons: zod.array(

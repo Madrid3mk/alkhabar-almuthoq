@@ -5,6 +5,7 @@
  * News verification platform API
  * OpenAPI spec version: 0.1.0
  */
+import type { Citation } from "./citation";
 import type { NewsCard } from "./newsCard";
 import type { NewsDetailAiExplanation } from "./newsDetailAiExplanation";
 import type { NewsDetailClaimsItem } from "./newsDetailClaimsItem";
@@ -12,7 +13,10 @@ import type { SourceMini } from "./sourceMini";
 
 export type NewsDetail = NewsCard & {
   body: string;
+  /** Deprecated convenience list of matched source entities. Prefer `citations` to display the exact URLs submitted by the author. */
   sources: SourceMini[];
+  /** One entry per URL submitted by the author, with the source entity attached if recognized. */
+  citations?: Citation[];
   aiExplanation: NewsDetailAiExplanation;
   claims: NewsDetailClaimsItem[];
 };

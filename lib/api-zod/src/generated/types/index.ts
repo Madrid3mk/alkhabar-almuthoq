@@ -7,6 +7,7 @@
  */
 
 export * from "./authorMini";
+export * from "./citation";
 export * from "./comment";
 export * from "./confidence";
 export * from "./dashboardSummary";

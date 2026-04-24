@@ -71,6 +71,15 @@ export interface SourceMini {
   verified?: boolean;
 }
 
+export interface Citation {
+  /** The exact URL the news author submitted as evidence (article, study, or official statement). */
+  url: string;
+  /** The matched source entity, when the URL belongs to a recognized publication. */
+  source?: SourceMini;
+  /** The hostname of the URL, useful for showing readers where the citation comes from when no entity match exists. */
+  domain?: string;
+}
+
 export type NewsCardStats = {
   likes: number;
   comments: number;
@@ -122,7 +131,10 @@ export type NewsDetailClaimsItem = {
 
 export type NewsDetail = NewsCard & {
   body: string;
+  /** Deprecated convenience list of matched source entities. Prefer `citations` to display the exact URLs submitted by the author. */
   sources: SourceMini[];
+  /** One entry per URL submitted by the author, with the source entity attached if recognized. */
+  citations?: Citation[];
   aiExplanation: NewsDetailAiExplanation;
   claims: NewsDetailClaimsItem[];
 };

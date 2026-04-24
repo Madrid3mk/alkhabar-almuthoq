@@ -382,6 +382,20 @@ components:
         verified:
           type: boolean
 
+    Citation:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+          description: The exact URL the news author submitted as evidence (article, study, or official statement).
+        source:
+          $ref: "#/components/schemas/SourceMini"
+          description: The matched source entity, when the URL belongs to a recognized publication.
+        domain:
+          type: string
+          description: The hostname of the URL, useful for showing readers where the citation comes from when no entity match exists.
+
     NewsCard:
       type: object
       required:
@@ -453,6 +467,12 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/SourceMini"
+              description: Deprecated convenience list of matched source entities. Prefer `citations` to display the exact URLs submitted by the author.
+            citations:
+              type: array
+              items:
+                $ref: "#/components/schemas/Citation"
+              description: One entry per URL submitted by the author, with the source entity attached if recognized.
             aiExplanation:
               type: object
               required: [verdict, reasons]
