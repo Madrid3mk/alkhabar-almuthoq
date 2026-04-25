@@ -52,7 +52,13 @@ export default function NewsExplain({ id }: { id: string }) {
           {news.aiExplanation.verdict}
         </p>
 
-        <ConfidenceBar confidence={news.confidence} score={news.confidenceScore} className="mt-2" />
+        <ConfidenceBar
+          confidence={news.confidence}
+          score={news.confidenceScore}
+          status={news.status}
+          className="mt-2"
+          size="lg"
+        />
       </div>
 
       <div className="flex flex-col gap-4">

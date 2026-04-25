@@ -192,7 +192,12 @@ export default function NewsDetail({ id }: { id: string }) {
           </Link>
         </div>
 
-        <ConfidenceBar confidence={news.confidence} score={news.confidenceScore} />
+        <ConfidenceBar
+          confidence={news.confidence}
+          score={news.confidenceScore}
+          status={news.status}
+          size="lg"
+        />
 
         <div className="bg-muted/50 p-4 rounded-lg text-sm leading-relaxed border border-border/50">
           <p className="flex gap-2">

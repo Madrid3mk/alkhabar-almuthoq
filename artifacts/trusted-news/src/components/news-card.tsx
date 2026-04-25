@@ -71,7 +71,13 @@ export function NewsCard({ news, className }: NewsCardProps) {
             {news.summary}
           </p>
 
-          <ConfidenceBar confidence={news.confidence} score={news.confidenceScore} className="mt-2" />
+          <ConfidenceBar
+            confidence={news.confidence}
+            score={news.confidenceScore}
+            status={news.status}
+            className="mt-2"
+            size="sm"
+          />
         </div>
       </Link>
 
