@@ -267,6 +267,13 @@ export interface DashboardSummary {
 
 export type ListNewsParams = {
   feed?: ListNewsFeed;
+  /**
+ * High-level geographic scope. `local` = news from any non-international
+location (e.g. عمّان، جدة، الرياض). `world` = international news
+(location = "دولي"). Combinable with `category` for two-axis filtering.
+
+ */
+  scope?: ListNewsScope;
   confidence?: ListNewsConfidence;
   /**
    * Filter by category label (Arabic). Use empty/omit for all categories.
@@ -284,6 +291,13 @@ export type ListNewsFeed = (typeof ListNewsFeed)[keyof typeof ListNewsFeed];
 export const ListNewsFeed = {
   for_you: "for_you",
   important: "important",
+  local: "local",
+  world: "world",
+} as const;
+
+export type ListNewsScope = (typeof ListNewsScope)[keyof typeof ListNewsScope];
+
+export const ListNewsScope = {
   local: "local",
   world: "world",
 } as const;

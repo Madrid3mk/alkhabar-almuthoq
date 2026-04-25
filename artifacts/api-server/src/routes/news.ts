@@ -11,7 +11,7 @@ import {
   type Source,
   type User,
 } from "@workspace/db";
-import { and, desc, eq, ilike, inArray, or, sql, type SQL } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, ne, or, sql, type SQL } from "drizzle-orm";
 import {
   ListNewsQueryParams,
   GetNewsParams,
@@ -94,6 +94,13 @@ router.get("/news", async (req, res) => {
   const categoryFilter = params.category?.trim();
   if (categoryFilter) {
     conds.push(eq(newsTable.category, categoryFilter));
+  }
+  // Geographic scope is independent of category — together they form a
+  // 2-axis filter (e.g. local + sports, world + economy).
+  if (params.scope === "local") {
+    conds.push(ne(newsTable.location, "دولي"));
+  } else if (params.scope === "world") {
+    conds.push(eq(newsTable.location, "دولي"));
   }
   // Free-text search runs across both title and body so authors and readers
   // can find a story using any phrase they remember.

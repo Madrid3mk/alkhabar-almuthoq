@@ -17,7 +17,11 @@ import Profile from "@/pages/profile";
 import Trust from "@/pages/trust";
 import Explore from "@/pages/explore";
 import SearchPage from "@/pages/search";
+import Settings from "@/pages/settings";
+import Reels from "@/pages/reels";
 import NotFound from "@/pages/not-found";
+import { ThemeProvider } from "@/lib/theme";
+import { I18nProvider } from "@/lib/i18n";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +51,12 @@ function Router() {
         </Route>
         <Route path="/search">
           <PageWrapper><SearchPage /></PageWrapper>
+        </Route>
+        <Route path="/settings">
+          <PageWrapper><Settings /></PageWrapper>
+        </Route>
+        <Route path="/reels">
+          <Reels />
         </Route>
         <Route path="/submit">
           <PageWrapper><Submit /></PageWrapper>
@@ -85,16 +95,20 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <Layout>
-            <Router />
-          </Layout>
-        </WouterRouter>
-        <Toaster />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <ThemeProvider>
+      <I18nProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+              <Layout>
+                <Router />
+              </Layout>
+            </WouterRouter>
+            <Toaster />
+          </TooltipProvider>
+        </QueryClientProvider>
+      </I18nProvider>
+    </ThemeProvider>
   );
 }
 

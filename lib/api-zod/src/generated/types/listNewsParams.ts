@@ -7,9 +7,17 @@
  */
 import type { ListNewsConfidence } from "./listNewsConfidence";
 import type { ListNewsFeed } from "./listNewsFeed";
+import type { ListNewsScope } from "./listNewsScope";
 
 export type ListNewsParams = {
   feed?: ListNewsFeed;
+  /**
+ * High-level geographic scope. `local` = news from any non-international
+location (e.g. عمّان، جدة، الرياض). `world` = international news
+(location = "دولي"). Combinable with `category` for two-axis filtering.
+
+ */
+  scope?: ListNewsScope;
   confidence?: ListNewsConfidence;
   /**
    * Filter by category label (Arabic). Use empty/omit for all categories.

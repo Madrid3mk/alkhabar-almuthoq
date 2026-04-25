@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { NEWS_CATEGORIES } from "@/lib/categories";
+import { useI18n } from "@/lib/i18n";
 
 interface CategoryChipsProps {
   value: string | null;
@@ -8,6 +9,7 @@ interface CategoryChipsProps {
 }
 
 export function CategoryChips({ value, onChange, className }: CategoryChipsProps) {
+  const { t } = useI18n();
   return (
     <div
       className={cn(
@@ -25,10 +27,11 @@ export function CategoryChips({ value, onChange, className }: CategoryChipsProps
             : "bg-card text-muted-foreground border-border",
         )}
       >
-        الكل
+        {t("chips.all")}
       </button>
       {NEWS_CATEGORIES.map((cat) => {
         const active = value === cat.value;
+        const label = t(`category.${cat.value}`, cat.label);
         return (
           <button
             key={cat.value}
@@ -42,7 +45,7 @@ export function CategoryChips({ value, onChange, className }: CategoryChipsProps
             )}
           >
             <span aria-hidden>{cat.emoji}</span>
-            <span>{cat.label}</span>
+            <span>{label}</span>
           </button>
         );
       })}

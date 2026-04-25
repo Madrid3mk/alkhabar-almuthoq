@@ -18,6 +18,7 @@ export * from "./healthStatus";
 export * from "./listNewsConfidence";
 export * from "./listNewsFeed";
 export * from "./listNewsParams";
+export * from "./listNewsScope";
 export * from "./listSourcesParams";
 export * from "./listSourcesType";
 export * from "./newsCard";

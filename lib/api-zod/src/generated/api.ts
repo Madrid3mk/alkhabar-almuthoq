@@ -21,6 +21,12 @@ export const listNewsQueryLimitDefault = 30;
 
 export const ListNewsQueryParams = zod.object({
   feed: zod.enum(["for_you", "important", "local", "world"]).optional(),
+  scope: zod
+    .enum(["local", "world"])
+    .optional()
+    .describe(
+      'High-level geographic scope. `local` = news from any non-international\nlocation (e.g. عمّان، جدة، الرياض). `world` = international news\n(location = \"دولي\"). Combinable with `category` for two-axis filtering.\n',
+    ),
   confidence: zod.enum(["high", "medium", "low"]).optional(),
   category: zod.coerce
     .string()

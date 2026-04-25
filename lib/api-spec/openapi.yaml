@@ -43,6 +43,15 @@ paths:
           schema:
             type: string
             enum: [for_you, important, local, world]
+        - name: scope
+          in: query
+          description: |
+            High-level geographic scope. `local` = news from any non-international
+            location (e.g. عمّان، جدة، الرياض). `world` = international news
+            (location = "دولي"). Combinable with `category` for two-axis filtering.
+          schema:
+            type: string
+            enum: [local, world]
         - name: confidence
           in: query
           schema:
