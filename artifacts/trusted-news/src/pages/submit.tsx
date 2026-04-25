@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { AlertCircle, Plus, X, Upload, ShieldX } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { NEWS_CATEGORIES } from "@/lib/categories";
 
 export default function Submit() {
   const [, setLocation] = useLocation();
@@ -196,13 +197,27 @@ export default function Submit() {
         </div>
 
         <div className="flex flex-col gap-3">
-          <Label htmlFor="category">التصنيف (اختياري)</Label>
-          <Input 
-            id="category" 
-            placeholder="مثال: سياسة، اقتصاد، تقنية..." 
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          />
+          <Label htmlFor="category">التصنيف</Label>
+          <div className="flex flex-wrap gap-2">
+            {NEWS_CATEGORIES.map((cat) => {
+              const selected = category === cat.value;
+              return (
+                <button
+                  key={cat.value}
+                  type="button"
+                  onClick={() => setCategory(selected ? "" : cat.value)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-colors hover-elevate ${
+                    selected
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-card text-muted-foreground border-border"
+                  }`}
+                >
+                  <span aria-hidden>{cat.emoji}</span>
+                  <span>{cat.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="flex flex-col gap-3">

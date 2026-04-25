@@ -11,7 +11,7 @@ import {
   type Source,
   type User,
 } from "@workspace/db";
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, or, sql, type SQL } from "drizzle-orm";
 import {
   ListNewsQueryParams,
   GetNewsParams,
@@ -85,22 +85,36 @@ async function loadCitationsFor(
 router.get("/news", async (req, res) => {
   const params = ListNewsQueryParams.parse(req.query);
 
-  const conds = [] as ReturnType<typeof eq>[];
+  const conds: SQL[] = [];
   if (params.confidence) {
     conds.push(eq(newsTable.confidence, params.confidence));
   }
+  // Direct category filter overrides the feed-based "local" shortcut. Trim
+  // empty strings so the chip "all" simply omits the filter.
+  const categoryFilter = params.category?.trim();
+  if (categoryFilter) {
+    conds.push(eq(newsTable.category, categoryFilter));
+  }
+  // Free-text search runs across both title and body so authors and readers
+  // can find a story using any phrase they remember.
+  const q = params.q?.trim();
+  if (q) {
+    const like = `%${q}%`;
+    const searchClause = or(ilike(newsTable.title, like), ilike(newsTable.body, like));
+    if (searchClause) conds.push(searchClause);
+  }
 
   let rows: News[];
-  if (params.feed === "local") {
+  // Feed shortcut tabs only apply when no explicit category was requested,
+  // so a chip selection always wins over the tab's implicit filter.
+  if (!categoryFilter && params.feed === "local") {
     rows = await db
       .select()
       .from(newsTable)
-      .where(
-        and(eq(newsTable.category, "محلي"), ...conds),
-      )
+      .where(and(eq(newsTable.category, "محلي"), ...conds))
       .orderBy(desc(newsTable.publishedAt))
       .limit(params.limit);
-  } else if (params.feed === "world") {
+  } else if (!categoryFilter && params.feed === "world") {
     rows = await db
       .select()
       .from(newsTable)
@@ -108,11 +122,10 @@ router.get("/news", async (req, res) => {
       .orderBy(desc(newsTable.publishedAt))
       .limit(params.limit);
   } else if (params.feed === "important") {
-    const baseConds = [eq(newsTable.confidence, "high"), ...conds.filter((c) => c)];
     rows = await db
       .select()
       .from(newsTable)
-      .where(and(...baseConds))
+      .where(and(eq(newsTable.confidence, "high"), ...conds))
       .orderBy(desc(newsTable.confidenceScore), desc(newsTable.publishedAt))
       .limit(params.limit);
   } else {

@@ -22,6 +22,16 @@ export const listNewsQueryLimitDefault = 30;
 export const ListNewsQueryParams = zod.object({
   feed: zod.enum(["for_you", "important", "local", "world"]).optional(),
   confidence: zod.enum(["high", "medium", "low"]).optional(),
+  category: zod.coerce
+    .string()
+    .optional()
+    .describe(
+      "Filter by category label (Arabic). Use empty\/omit for all categories.",
+    ),
+  q: zod.coerce
+    .string()
+    .optional()
+    .describe("Free-text search across title and body."),
   limit: zod.coerce.number().default(listNewsQueryLimitDefault),
 });
 

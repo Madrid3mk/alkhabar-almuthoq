@@ -268,6 +268,14 @@ export interface DashboardSummary {
 export type ListNewsParams = {
   feed?: ListNewsFeed;
   confidence?: ListNewsConfidence;
+  /**
+   * Filter by category label (Arabic). Use empty/omit for all categories.
+   */
+  category?: string;
+  /**
+   * Free-text search across title and body.
+   */
+  q?: string;
   limit?: number;
 };
 

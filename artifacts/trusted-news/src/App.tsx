@@ -16,6 +16,7 @@ import SourceDetail from "@/pages/source-detail";
 import Profile from "@/pages/profile";
 import Trust from "@/pages/trust";
 import Explore from "@/pages/explore";
+import SearchPage from "@/pages/search";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
@@ -43,6 +44,9 @@ function Router() {
         </Route>
         <Route path="/explore">
           <PageWrapper><Explore /></PageWrapper>
+        </Route>
+        <Route path="/search">
+          <PageWrapper><SearchPage /></PageWrapper>
         </Route>
         <Route path="/submit">
           <PageWrapper><Submit /></PageWrapper>

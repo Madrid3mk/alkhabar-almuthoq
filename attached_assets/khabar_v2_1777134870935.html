@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>الخبر الموثوق</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0d14;
+  --bg2: #13131c;
+  --bg3: #1a1a26;
+  --card: #1e1e2e;
+  --card2: #252538;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.11);
+  --text: #eeeef5;
+  --text2: #8888a8;
+  --text3: #55556a;
+  --blue: #3b82f6;
+  --blue2: #60a5fa;
+  --green: #22c55e;
+  --green2: #4ade80;
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --purple: #a855f7;
+  --teal: #14b8a6;
+  --pink: #ec4899;
+  --confirmed-bg: rgba(34,197,94,0.1);
+  --unconfirmed-bg: rgba(245,158,11,0.1);
+  --rumor-bg: rgba(168,85,247,0.12);
+  --nav-h: 64px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;min-height:100vh;overflow-x:hidden;max-width:430px;margin:0 auto;position:relative;}
+
+/* ── PAGES ── */
+.page{display:none;min-height:100vh;padding-bottom:calc(var(--nav-h) + 16px);}
+.page.active{display:block;}
+
+/* ── NAVBAR ── */
+.navbar{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;
+  background:rgba(19,19,28,0.97);backdrop-filter:blur(24px);
+  border-top:1px solid var(--border2);
+  display:flex;justify-content:space-around;align-items:center;
+  height:var(--nav-h);z-index:900;padding:0 8px 4px;
+}
+.nav-btn{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:6px 12px;border:none;background:none;cursor:pointer;
+  color:var(--text3);font-family:'Cairo',sans-serif;font-size:10px;font-weight:600;
+  border-radius:12px;transition:all .2s;flex:1;
+}
+.nav-btn.active{color:var(--blue2);}
+.nav-btn svg{width:22px;height:22px;stroke-width:1.8;}
+.nav-btn-center{
+  width:52px;height:52px;border-radius:50%;
+  background:var(--blue);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 20px rgba(59,130,246,0.4);
+  transition:all .2s;flex-shrink:0;margin-bottom:8px;
+}
+.nav-btn-center:active{transform:scale(0.93);}
+.nav-btn-center svg{width:22px;height:22px;stroke:#fff;stroke-width:2.2;}
+
+/* ── HEADER ── */
+.top-bar{
+  padding:48px 18px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+  background:linear-gradient(180deg,#0d0d14 70%,transparent);
+}
+.app-logo{font-size:22px;font-weight:900;letter-spacing:-0.5px;}
+.app-logo span{color:var(--blue2);}
+.top-actions{display:flex;gap:10px;align-items:center;}
+.icon-btn{
+  width:38px;height:38px;border-radius:50%;
+  background:var(--bg3);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.icon-btn svg{width:18px;height:18px;stroke:var(--text2);}
+
+/* ── TABS ── */
+.tabs{
+  display:flex;gap:0;overflow-x:auto;scrollbar-width:none;
+  border-bottom:1px solid var(--border);padding:0 18px;
+}
+.tabs::-webkit-scrollbar{display:none;}
+.tab-btn{
+  flex-shrink:0;padding:10px 16px;background:none;border:none;
+  color:var(--text3);font-family:'Cairo',sans-serif;font-size:13px;font-weight:600;
+  cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;
+  white-space:nowrap;
+}
+.tab-btn.active{color:var(--blue2);border-bottom-color:var(--blue2);}
+
+/* ── FILTER CHIPS ── */
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:10px 18px;}
+.chips::-webkit-scrollbar{display:none;}
+.chip{
+  flex-shrink:0;padding:6px 14px;border-radius:20px;
+  border:1px solid var(--border2);background:var(--bg3);
+  color:var(--text2);font-family:'Cairo',sans-serif;font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .2s;white-space:nowrap;
+}
+.chip.active{background:var(--blue);border-color:var(--blue);color:#fff;}
+
+/* ── NEWS CARD ── */
+.feed{padding:8px 14px;}
+.news-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:18px;margin-bottom:12px;overflow:hidden;
+  cursor:pointer;transition:all .2s;animation:fadeUp .3s ease both;
+}
+.news-card:active{transform:scale(0.98);}
+.news-card.rumor-card{border-color:rgba(168,85,247,0.25);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+.card-img-wrap{position:relative;height:170px;overflow:hidden;background:var(--bg3);}
+.card-img-wrap img{width:100%;height:100%;object-fit:cover;}
+.card-img-placeholder{
+  width:100%;height:100%;display:flex;align-items:center;
+  justify-content:center;font-size:42px;
+}
+.card-overlay-badge{
+  position:absolute;top:10px;right:10px;
+  padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;
+  backdrop-filter:blur(8px);
+}
+.badge-confirmed{background:rgba(34,197,94,0.85);color:#fff;}
+.badge-unconfirmed{background:rgba(245,158,11,0.85);color:#fff;}
+.badge-rumor-bust{background:rgba(168,85,247,0.9);color:#fff;}
+.badge-time{
+  position:absolute;bottom:8px;left:10px;
+  background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);
+  padding:3px 8px;border-radius:6px;font-size:10px;color:rgba(255,255,255,0.8);
+}
+.card-body{padding:12px 14px;}
+.card-meta{display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
+.cat-pill{
+  padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;
+}
+.rumor-pill{background:var(--rumor-bg);color:var(--purple);padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;}
+.card-title{font-size:15px;font-weight:700;line-height:1.55;margin-bottom:8px;}
+.card-trust-row{display:flex;align-items:center;gap:6px;margin-bottom:10px;}
+.trust-label{font-size:11px;font-weight:600;color:var(--text3);}
+.trust-bar-wrap{flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;}
+.trust-bar-fill{height:100%;border-radius:2px;transition:width .6s ease;}
+.trust-pct{font-size:11px;font-weight:700;min-width:32px;text-align:left;}
+
+.card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border);}
+.author-row{display:flex;align-items:center;gap:7px;}
+.avatar-sm{
+  width:26px;height:26px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;flex-shrink:0;
+}
+.author-name-sm{font-size:12px;font-weight:600;color:var(--text2);display:flex;align-items:center;gap:3px;}
+.v-check{
+  width:14px;height:14px;border-radius:50%;background:var(--blue);
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:8px;color:#fff;flex-shrink:0;
+}
+.card-actions{display:flex;gap:12px;align-items:center;}
+.action-btn{
+  display:flex;align-items:center;gap:3px;
+  color:var(--text3);font-size:11px;font-weight:600;
+  background:none;border:none;cursor:pointer;
+}
+.action-btn svg{width:14px;height:14px;stroke:var(--text3);}
+
+/* cats */
+.c-sports{background:rgba(34,197,94,0.12);color:#22c55e;}
+.c-politics{background:rgba(239,68,68,0.12);color:#ef4444;}
+.c-tech{background:rgba(59,130,246,0.12);color:#60a5fa;}
+.c-local{background:rgba(245,158,11,0.12);color:#f59e0b;}
+.c-arabic{background:rgba(168,85,247,0.12);color:#a855f7;}
+.c-world{background:rgba(20,184,166,0.12);color:#14b8a6;}
+.c-war{background:rgba(239,68,68,0.18);color:#f87171;}
+.c-entertainment{background:rgba(236,72,153,0.12);color:#ec4899;}
+
+/* ── PUBLISH PAGE ── */
+.pub-header{padding:48px 18px 16px;display:flex;align-items:center;gap:12px;}
+.back-btn{
+  width:36px;height:36px;border-radius:50%;background:var(--bg3);
+  border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.back-btn svg{width:18px;height:18px;stroke:var(--text2);}
+.pub-title-text{font-size:18px;font-weight:800;}
+
+.form-section{background:var(--card);border:1px solid var(--border);border-radius:16px;margin:0 14px 14px;overflow:hidden;}
+.form-row{padding:13px 16px;border-bottom:1px solid var(--border);}
+.form-row:last-child{border-bottom:none;}
+.form-label{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:7px;display:flex;align-items:center;gap:6px;}
+.req{color:var(--blue2);}
+.form-input,.form-select,.form-textarea{
+  width:100%;background:var(--bg3);border:1px solid var(--border2);
+  border-radius:10px;padding:10px 13px;color:var(--text);
+  font-family:'Cairo',sans-serif;font-size:14px;outline:none;
+  transition:border-color .2s;direction:rtl;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--blue);}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--text3);}
+.form-textarea{min-height:110px;resize:none;line-height:1.8;}
+.form-select option{background:var(--bg3);}
+.char-hint{font-size:11px;color:var(--text3);margin-top:5px;text-align:left;}
+
+/* Article type toggle */
+.type-toggle{display:flex;gap:8px;margin-bottom:0;}
+.type-opt{
+  flex:1;padding:10px 8px;border-radius:10px;border:1px solid var(--border2);
+  background:var(--bg3);text-align:center;cursor:pointer;transition:all .2s;
+}
+.type-opt.selected{border-color:var(--blue);background:rgba(59,130,246,0.1);}
+.type-opt.rumor-opt.selected{border-color:var(--purple);background:rgba(168,85,247,0.1);}
+.type-opt-icon{font-size:20px;margin-bottom:4px;}
+.type-opt-label{font-size:12px;font-weight:700;color:var(--text2);}
+.type-opt.selected .type-opt-label{color:var(--blue2);}
+.type-opt.rumor-opt.selected .type-opt-label{color:var(--purple);}
+
+/* Sources list */
+.sources-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.source-item{
+  display:flex;align-items:flex-start;gap:8px;
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:10px;padding:10px 12px;
+}
+.source-num{
+  width:22px;height:22px;border-radius:50%;background:var(--blue);
+  color:#fff;font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
+}
+.source-inputs{flex:1;display:flex;flex-direction:column;gap:6px;}
+.source-input-sm{
+  width:100%;background:var(--bg2);border:1px solid var(--border2);
+  border-radius:8px;padding:8px 10px;color:var(--text);
+  font-family:'Cairo',sans-serif;font-size:13px;outline:none;direction:rtl;
+}
+.source-input-sm::placeholder{color:var(--text3);}
+.source-input-sm:focus{border-color:var(--blue);}
+.source-url{direction:ltr;text-align:left;font-size:12px;}
+.source-remove{
+  width:22px;height:22px;border-radius:50%;background:rgba(239,68,68,0.1);
+  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--red);font-size:14px;flex-shrink:0;
+}
+.add-source-btn{
+  width:100%;padding:9px;border-radius:10px;border:1px dashed var(--border2);
+  background:none;color:var(--blue2);font-family:'Cairo',sans-serif;
+  font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.add-source-btn:hover{border-color:var(--blue);background:rgba(59,130,246,0.05);}
+
+/* File upload */
+.files-grid{display:flex;gap:8px;flex-wrap:wrap;}
+.file-thumb{
+  width:72px;height:72px;border-radius:10px;
+  background:var(--bg3);border:1px solid var(--border2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;cursor:pointer;position:relative;overflow:hidden;
+}
+.file-thumb img{width:100%;height:100%;object-fit:cover;}
+.file-thumb .remove-file{
+  position:absolute;top:3px;right:3px;
+  width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,0.7);
+  color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.add-file-btn{
+  width:72px;height:72px;border-radius:10px;
+  background:var(--bg3);border:2px dashed var(--border2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;cursor:pointer;color:var(--text3);font-size:10px;font-weight:600;
+}
+.add-file-btn svg{width:20px;height:20px;stroke:var(--text3);}
+
+/* Rumor banner */
+.rumor-banner{
+  margin:0 14px 12px;padding:14px 16px;
+  background:var(--rumor-bg);border:1px solid rgba(168,85,247,0.2);
+  border-radius:14px;display:flex;align-items:flex-start;gap:10px;
+}
+.rumor-banner-icon{font-size:22px;flex-shrink:0;}
+.rumor-banner-text{font-size:13px;color:var(--text2);line-height:1.7;}
+.rumor-banner-title{font-size:14px;font-weight:700;color:var(--purple);margin-bottom:4px;}
+
+.submit-btn{
+  width:calc(100% - 28px);margin:4px 14px 10px;
+  padding:15px;border-radius:14px;border:none;
+  background:var(--blue);color:#fff;
+  font-family:'Cairo',sans-serif;font-size:15px;font-weight:800;
+  cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.submit-btn:active{transform:scale(0.97);}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+/* ── VERIFY SHEET ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.8);
+  z-index:800;display:none;align-items:flex-end;justify-content:center;
+}
+.modal-overlay.open{display:flex;}
+.sheet{
+  background:var(--bg2);border-radius:24px 24px 0 0;
+  width:100%;max-width:430px;max-height:92vh;overflow-y:auto;
+  padding:20px 18px 90px;animation:slideUp .3s cubic-bezier(.2,.8,.4,1);
+}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.sheet-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px;}
+.sheet-title{font-size:18px;font-weight:800;margin-bottom:16px;text-align:center;}
+
+/* Verify progress */
+.verify-ring-wrap{text-align:center;padding:20px 0 24px;}
+.verify-ring{width:120px;height:120px;margin:0 auto 12px;position:relative;}
+.verify-ring svg{width:120px;height:120px;transform:rotate(-90deg);}
+.ring-track{fill:none;stroke:var(--bg3);stroke-width:8;}
+.ring-fill{fill:none;stroke:var(--green);stroke-width:8;stroke-linecap:round;stroke-dasharray:345;stroke-dashoffset:345;transition:stroke-dashoffset 1.5s ease;}
+.ring-pct{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  text-align:center;
+}
+.ring-num{font-size:26px;font-weight:900;color:var(--text);}
+.ring-label{font-size:11px;color:var(--text3);}
+.verify-steps{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.verify-step{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 14px;background:var(--card);border-radius:12px;
+  border:1px solid var(--border);
+}
+.step-icon{
+  width:30px;height:30px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-size:14px;background:var(--bg3);border:1px solid var(--border2);
+}
+.step-icon.done{background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,0.3);}
+.step-icon.loading{background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.2);}
+.step-icon.pending{background:var(--bg3);}
+.step-text{font-size:13px;font-weight:600;color:var(--text2);}
+.step-done-check{color:var(--green);margin-right:auto;font-size:14px;}
+.step-spinner{
+  width:16px;height:16px;border:2px solid var(--border2);border-top-color:var(--blue);
+  border-radius:50%;animation:spin .8s linear infinite;margin-right:auto;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Trust level */
+.trust-level-card{
+  background:linear-gradient(135deg,rgba(34,197,94,0.08),rgba(59,130,246,0.08));
+  border:1px solid rgba(34,197,94,0.2);border-radius:16px;
+  padding:20px;text-align:center;margin-bottom:16px;
+}
+.trust-shield{font-size:52px;margin-bottom:8px;}
+.trust-level-title{font-size:20px;font-weight:900;color:var(--green2);margin-bottom:4px;}
+.trust-level-sub{font-size:13px;color:var(--text2);}
+.trust-checks{display:flex;flex-direction:column;gap:8px;}
+.trust-check-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;background:var(--card);border-radius:10px;
+  border:1px solid var(--border);
+}
+.tc-label{font-size:13px;color:var(--text2);}
+.tc-value{font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;}
+.tc-done{color:var(--green);}
+.tc-pending{color:var(--amber);}
+
+/* ── ARTICLE DETAIL ── */
+.article-header{padding:48px 18px 16px;display:flex;align-items:center;justify-content:space-between;}
+.article-badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.article-title{font-size:20px;font-weight:800;line-height:1.6;margin-bottom:12px;}
+.article-author-row{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 14px;background:var(--card);border-radius:12px;
+  border:1px solid var(--border);margin-bottom:16px;
+}
+.avatar-md{
+  width:40px;height:40px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:700;color:#fff;flex-shrink:0;
+}
+.author-info-col{flex:1;}
+.author-name-md{font-size:14px;font-weight:700;display:flex;align-items:center;gap:5px;}
+.author-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.follow-btn{
+  padding:6px 14px;border-radius:20px;border:1px solid var(--blue);
+  background:rgba(59,130,246,0.1);color:var(--blue2);
+  font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;
+}
+.article-trust-bar{
+  padding:12px 14px;background:var(--card);border-radius:12px;
+  border:1px solid var(--border);margin-bottom:16px;
+}
+.atb-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.atb-label{font-size:13px;font-weight:700;color:var(--text2);}
+.atb-pct{font-size:15px;font-weight:900;}
+.atb-track{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;}
+.atb-fill{height:100%;border-radius:3px;transition:width 1s ease;}
+.atb-sub{font-size:12px;color:var(--text3);margin-top:8px;line-height:1.6;}
+
+.article-body-text{font-size:15px;line-height:1.9;color:var(--text2);margin-bottom:20px;}
+
+/* Rumor bust section */
+.rumor-bust-section{
+  background:var(--rumor-bg);border:1px solid rgba(168,85,247,0.25);
+  border-radius:14px;padding:14px 16px;margin-bottom:16px;
+}
+.rbs-title{font-size:14px;font-weight:800;color:var(--purple);margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+.rbs-body{font-size:13px;color:var(--text2);line-height:1.7;}
+
+/* Sources section */
+.section-label{font-size:12px;font-weight:800;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;}
+.source-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:12px 14px;margin-bottom:8px;
+  display:flex;align-items:flex-start;gap:10px;cursor:pointer;
+}
+.source-card:active{transform:scale(0.98);}
+.src-num{
+  width:24px;height:24px;border-radius:50%;background:var(--blue);
+  color:#fff;font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
+}
+.src-info{flex:1;}
+.src-name{font-size:13px;font-weight:700;margin-bottom:3px;}
+.src-url{font-size:11px;color:var(--blue2);direction:ltr;text-align:left;word-break:break-all;}
+.src-arrow{color:var(--text3);font-size:18px;align-self:center;}
+
+/* Files grid in article */
+.evidence-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.evidence-thumb{
+  aspect-ratio:1;border-radius:10px;overflow:hidden;
+  background:var(--bg3);border:1px solid var(--border);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+}
+.evidence-thumb img{width:100%;height:100%;object-fit:cover;}
+
+/* AI explanation */
+.ai-explain{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:14px 16px;margin-bottom:16px;
+}
+.ai-explain-title{font-size:14px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.ai-icon{
+  width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));
+  display:flex;align-items:center;justify-content:center;font-size:14px;
+}
+.ai-check-list{display:flex;flex-direction:column;gap:8px;}
+.ai-check-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);}
+.ai-check-item .ck{color:var(--green);font-size:14px;}
+
+/* Article actions */
+.article-actions{
+  display:flex;gap:10px;margin-bottom:20px;
+  padding:12px 14px;background:var(--card);border-radius:12px;border:1px solid var(--border);
+}
+.art-action{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  background:none;border:none;cursor:pointer;color:var(--text3);
+  font-family:'Cairo',sans-serif;font-size:11px;font-weight:600;
+}
+.art-action svg{width:20px;height:20px;stroke:var(--text3);}
+.art-action.liked svg{stroke:var(--red);}
+.art-action.liked{color:var(--red);}
+
+/* ── PROFILE PAGE ── */
+.profile-top{
+  padding:48px 18px 20px;
+  display:flex;flex-direction:column;align-items:center;
+  background:linear-gradient(180deg,#0d0d14 60%,transparent);
+}
+.avatar-xl{
+  width:88px;height:88px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;font-weight:900;color:#fff;
+  border:3px solid var(--border2);margin-bottom:10px;
+}
+.profile-name{font-size:20px;font-weight:800;margin-bottom:3px;display:flex;align-items:center;gap:7px;}
+.profile-handle{font-size:13px;color:var(--text3);margin-bottom:6px;}
+.profile-tier-badge{
+  padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;
+  display:flex;align-items:center;gap:6px;
+}
+.tier-verified{background:rgba(59,130,246,0.12);color:var(--blue2);border:1px solid rgba(59,130,246,0.25);}
+.tier-trusted{background:rgba(34,197,94,0.1);color:var(--green2);border:1px solid rgba(34,197,94,0.2);}
+.tier-new{background:var(--bg3);color:var(--text2);border:1px solid var(--border2);}
+
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 14px 16px;}
+.stat-box{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:14px 10px;text-align:center;
+}
+.stat-n{font-size:22px;font-weight:900;}
+.stat-l{font-size:11px;color:var(--text3);margin-top:3px;font-weight:600;}
+
+.acc-wrap{padding:0 14px 16px;}
+.acc-header{display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px;}
+.acc-track{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;}
+.acc-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--green),var(--green2));transition:width .8s ease;}
+
+/* Tier progress */
+.tier-progress-card{
+  margin:0 14px 14px;background:var(--card);
+  border:1px solid var(--border);border-radius:16px;padding:16px;
+}
+.tp-title{font-size:13px;font-weight:700;color:var(--text2);margin-bottom:14px;}
+.tp-level{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 12px;border-radius:10px;border:1px solid var(--border);
+  background:var(--bg3);margin-bottom:8px;
+}
+.tp-level:last-child{margin-bottom:0;}
+.tp-level.current-tier{border-color:var(--blue);background:rgba(59,130,246,0.08);}
+.tp-dot{width:10px;height:10px;border-radius:50%;background:var(--text3);flex-shrink:0;}
+.tp-dot.done{background:var(--green);}
+.tp-dot.curr{background:var(--blue);}
+.tp-info{flex:1;}
+.tp-name{font-size:13px;font-weight:700;}
+.tp-req{font-size:11px;color:var(--text3);margin-top:2px;}
+
+.settings-section{margin:0 14px 14px;background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.settings-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;
+}
+.settings-row:last-child{border-bottom:none;}
+.sr-left{display:flex;align-items:center;gap:10px;}
+.sr-icon{
+  width:34px;height:34px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  background:var(--bg3);
+}
+.sr-label{font-size:14px;font-weight:600;}
+.sr-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.sr-arrow{color:var(--text3);font-size:20px;}
+
+/* ── SEARCH PAGE ── */
+.search-wrap{padding:48px 14px 8px;}
+.search-box{
+  display:flex;align-items:center;gap:10px;
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:14px;padding:11px 14px;margin-bottom:0;
+}
+.search-box svg{width:18px;height:18px;stroke:var(--text3);flex-shrink:0;}
+.search-input{
+  flex:1;background:none;border:none;color:var(--text);
+  font-family:'Cairo',sans-serif;font-size:15px;outline:none;direction:rtl;
+}
+.search-input::placeholder{color:var(--text3);}
+
+.empty-state{text-align:center;padding:50px 20px;color:var(--text3);}
+.empty-icon{font-size:48px;margin-bottom:12px;}
+.empty-t{font-size:14px;line-height:1.7;}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);
+  background:var(--card2);border:1px solid var(--border2);border-radius:14px;
+  padding:12px 20px;font-size:13px;font-weight:700;z-index:9999;
+  transition:transform .3s;max-width:340px;text-align:center;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);white-space:nowrap;
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.ok{border-color:var(--green);color:var(--green2);}
+.toast.err{border-color:var(--red);color:var(--red);}
+.toast.warn{border-color:var(--amber);color:var(--amber);}
+.toast.purple{border-color:var(--purple);color:var(--purple);}
+
+/* ── LIGHTBOX ── */
+.lightbox{
+  position:fixed;inset:0;background:rgba(0,0,0,0.95);
+  z-index:1200;display:none;align-items:center;justify-content:center;
+}
+.lightbox.open{display:flex;}
+.lightbox img{max-width:95%;max-height:90vh;object-fit:contain;border-radius:12px;}
+.lb-close{
+  position:absolute;top:20px;right:20px;
+  width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.1);
+  border:none;color:#fff;font-size:20px;cursor:pointer;
+}
+
+::-webkit-scrollbar{width:0;}
+input[type=file]{display:none;}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lb-close" onclick="closeLightbox()">×</button>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<!-- VERIFY MODAL -->
+<div class="modal-overlay" id="verify-modal">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="vm-title">التحقق من الخبر</div>
+    <div id="verify-content"></div>
+  </div>
+</div>
+
+<!-- ARTICLE MODAL -->
+<div class="modal-overlay" id="article-modal" onclick="closeArticleIfOverlay(event)">
+  <div class="sheet" id="article-sheet">
+    <div class="sheet-handle" onclick="closeArticleModal()"></div>
+    <div id="article-content"></div>
+  </div>
+</div>
+
+<!-- ═══ FYP PAGE ═══ -->
+<div class="page active" id="page-fyp">
+  <div class="top-bar">
+    <div class="app-logo">الخبر <span>الموثوق</span></div>
+    <div class="top-actions">
+      <div class="icon-btn">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </div>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="setFypTab('foryou',this)">لك</button>
+    <button class="tab-btn" onclick="setFypTab('top',this)">أهم الأخبار</button>
+    <button class="tab-btn" onclick="setFypTab('local',this)">محلي</button>
+    <button class="tab-btn" onclick="setFypTab('world',this)">دولي</button>
+  </div>
+  <div class="chips" id="fyp-chips">
+    <button class="chip active" onclick="setFypCat('all',this)">الكل</button>
+    <button class="chip" onclick="setFypCat('sports',this)">⚽ رياضة</button>
+    <button class="chip" onclick="setFypCat('politics',this)">🏛 سياسة</button>
+    <button class="chip" onclick="setFypCat('tech',this)">💻 تكنولوجيا</button>
+    <button class="chip" onclick="setFypCat('local',this)">📍 محلية</button>
+    <button class="chip" onclick="setFypCat('arabic',this)">🌙 عربية</button>
+    <button class="chip" onclick="setFypCat('world',this)">🌍 عالمية</button>
+    <button class="chip" onclick="setFypCat('war',this)">⚔ حرب</button>
+    <button class="chip" onclick="setFypCat('entertainment',this)">🎬 ترفيه</button>
+  </div>
+  <div class="feed" id="fyp-feed"></div>
+</div>
+
+<!-- ═══ SEARCH PAGE ═══ -->
+<div class="page" id="page-search">
+  <div class="search-wrap">
+    <div class="search-box">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="search-input" id="search-input" placeholder="ابحث عن خبر أو مصدر..." oninput="doSearch(this.value)">
+    </div>
+  </div>
+  <div class="chips" id="search-chips">
+    <button class="chip active" onclick="setSearchCat('all',this)">الكل</button>
+    <button class="chip" onclick="setSearchCat('sports',this)">⚽ رياضة</button>
+    <button class="chip" onclick="setSearchCat('politics',this)">🏛 سياسة</button>
+    <button class="chip" onclick="setSearchCat('tech',this)">💻 تكنولوجيا</button>
+    <button class="chip" onclick="setSearchCat('local',this)">📍 محلية</button>
+    <button class="chip" onclick="setSearchCat('arabic',this)">🌙 عربية</button>
+    <button class="chip" onclick="setSearchCat('world',this)">🌍 عالمية</button>
+    <button class="chip" onclick="setSearchCat('war',this)">⚔ حرب</button>
+    <button class="chip" onclick="setSearchCat('entertainment',this)">🎬 ترفيه</button>
+  </div>
+  <div class="feed" id="search-results">
+    <div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-t">ابحث عن أي خبر<br><span style="color:var(--text3);font-size:12px">بالعنوان أو المحتوى أو المصدر</span></div></div>
+  </div>
+</div>
+
+<!-- ═══ PUBLISH PAGE ═══ -->
+<div class="page" id="page-publish">
+  <div class="pub-header">
+    <div class="back-btn" onclick="goHome()">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+    <div class="pub-title-text">نشر خبر</div>
+  </div>
+
+  <!-- article type -->
+  <div class="form-section">
+    <div class="form-row">
+      <div class="form-label">نوع المنشور <span class="req">*</span></div>
+      <div class="type-toggle">
+        <div class="type-opt selected" id="type-news" onclick="selectType('news')">
+          <div class="type-opt-icon">📰</div>
+          <div class="type-opt-label">خبر</div>
+        </div>
+        <div class="type-opt rumor-opt" id="type-rumor" onclick="selectType('rumor')">
+          <div class="type-opt-icon">🚫</div>
+          <div class="type-opt-label">إبطال شائعة</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="rumor-banner-wrap" style="display:none">
+    <div class="rumor-banner">
+      <div class="rumor-banner-icon">🔍</div>
+      <div>
+        <div class="rumor-banner-title">وضع إبطال الشائعة</div>
+        <div class="rumor-banner-text">إبطال الشائعة الموثق جيداً يمنحك تقييماً أعلى من الأخبار العادية — لأنك تكافح المعلومات المضللة بدليل.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <div class="form-row">
+      <div class="form-label">عنوان الخبر <span class="req">*</span></div>
+      <input class="form-input" id="pub-title" placeholder="اكتب عنواناً واضحاً ودقيقاً..." oninput="cc('pub-title','tc',120)" maxlength="120">
+      <div class="char-hint"><span id="tc">0</span>/120</div>
+    </div>
+    <div class="form-row" id="rumor-original-row" style="display:none">
+      <div class="form-label">🚫 نص الشائعة المراد إبطالها <span class="req">*</span></div>
+      <input class="form-input" id="pub-rumor-original" placeholder="انسخ نص الشائعة هنا...">
+    </div>
+    <div class="form-row">
+      <div class="form-label">التصنيف <span class="req">*</span></div>
+      <select class="form-select" id="pub-cat">
+        <option value="">اختر...</option>
+        <option value="sports">⚽ رياضة</option>
+        <option value="politics">🏛 سياسة</option>
+        <option value="tech">💻 تكنولوجيا</option>
+        <option value="local">📍 محلية</option>
+        <option value="arabic">🌙 عربية</option>
+        <option value="world">🌍 عالمية</option>
+        <option value="war">⚔ حرب</option>
+        <option value="entertainment">🎬 ترفيه</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-label" id="body-label">تفاصيل الخبر <span class="req">*</span></div>
+      <textarea class="form-textarea" id="pub-body" placeholder="اكتب تفاصيل الخبر كاملة..." oninput="cc('pub-body','bc',3000)" maxlength="3000"></textarea>
+      <div class="char-hint"><span id="bc">0</span>/3000 • الحد الأدنى 80 كلمة</div>
+    </div>
+  </div>
+
+  <!-- sources -->
+  <div class="form-section">
+    <div class="form-row">
+      <div class="form-label">
+        📎 المصادر <span class="req">*</span>
+        <span style="color:var(--text3);font-size:11px;font-weight:400"> — رابط المقالة/الدراسة المباشر لا رابط الموقع فقط</span>
+      </div>
+      <div class="sources-list" id="sources-list"></div>
+      <button class="add-source-btn" onclick="addSource()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        إضافة مصدر آخر
+      </button>
+    </div>
+  </div>
+
+  <!-- files -->
+  <div class="form-section">
+    <div class="form-row">
+      <div class="form-label">📁 الصور والملفات الداعمة <span style="color:var(--text3);font-size:11px;font-weight:400">(اختياري)</span></div>
+      <div class="files-grid" id="files-grid">
+        <div class="add-file-btn" onclick="document.getElementById('file-input').click()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>إضافة</span>
+        </div>
+      </div>
+      <input type="file" id="file-input" accept="image/*,.pdf" multiple onchange="handleFiles(this)">
+    </div>
+  </div>
+
+  <button class="submit-btn" id="submit-btn" onclick="publishArticle()">
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="m22 2-11 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+    إرسال للتحقق
+  </button>
+</div>
+
+<!-- ═══ PROFILE PAGE ═══ -->
+<div class="page" id="page-profile">
+  <div class="profile-top">
+    <div class="avatar-xl" id="p-avatar" style="background:linear-gradient(135deg,#3b82f6,#a855f7)">م</div>
+    <div class="profile-name" id="p-name">مستخدم <span id="p-vcheck"></span></div>
+    <div class="profile-handle" id="p-handle">@user</div>
+    <div class="profile-tier-badge tier-new" id="p-tier-badge">حساب عادي</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-n" id="ps-total">0</div><div class="stat-l">منشور</div></div>
+    <div class="stat-box"><div class="stat-n" style="color:var(--green)" id="ps-conf">0</div><div class="stat-l">مؤكدة</div></div>
+    <div class="stat-box"><div class="stat-n" style="color:var(--red)" id="ps-rej">0</div><div class="stat-l">مرفوضة</div></div>
+  </div>
+
+  <div class="acc-wrap">
+    <div class="acc-header"><span>نسبة الدقة</span><span id="p-acc-pct" style="color:var(--green);font-weight:800">0%</span></div>
+    <div class="acc-track"><div class="acc-fill" id="p-acc-bar" style="width:0%"></div></div>
+  </div>
+
+  <div class="tier-progress-card">
+    <div class="tp-title">مستويات الحساب</div>
+    <div class="tp-level" id="tier-new"><div class="tp-dot"></div><div class="tp-info"><div class="tp-name">حساب عادي</div><div class="tp-req">المستوى الابتدائي</div></div></div>
+    <div class="tp-level" id="tier-trusted"><div class="tp-dot"></div><div class="tp-info"><div class="tp-name">موثوق</div><div class="tp-req">5+ منشورات • دقة 70%+</div></div></div>
+    <div class="tp-level" id="tier-verified"><div class="tp-dot"></div><div class="tp-info"><div class="tp-name">ناشر موثوق ✓</div><div class="tp-req">10+ منشورات • دقة 90%+</div></div></div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-row" onclick="editName()">
+      <div class="sr-left"><div class="sr-icon">✏️</div><div><div class="sr-label">تعديل الاسم</div><div class="sr-sub" id="sr-name-sub">انقر للتعديل</div></div></div>
+      <div class="sr-arrow">›</div>
+    </div>
+    <div class="settings-row" onclick="clearData()">
+      <div class="sr-left"><div class="sr-icon">🗑️</div><div><div class="sr-label" style="color:var(--red)">إعادة تعيين</div><div class="sr-sub">حذف كل البيانات</div></div></div>
+      <div class="sr-arrow" style="color:var(--red)">›</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ NAVBAR ═══ -->
+<nav class="navbar">
+  <button class="nav-btn active" id="nb-fyp" onclick="showPage('fyp',this)">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    الرئيسية
+  </button>
+  <button class="nav-btn" id="nb-search" onclick="showPage('search',this)">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    استكشاف
+  </button>
+  <button class="nav-btn-center" onclick="showPage('publish',null)">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <button class="nav-btn" id="nb-profile" onclick="showPage('profile',this)">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    ملفي
+  </button>
+</nav>
+
+<script>
+// ════════════ CONSTANTS ════════════
+const CATS = {
+  sports:{l:'رياضة',e:'⚽',c:'c-sports',col:'#22c55e'},
+  politics:{l:'سياسة',e:'🏛',c:'c-politics',col:'#ef4444'},
+  tech:{l:'تكنولوجيا',e:'💻',c:'c-tech',col:'#60a5fa'},
+  local:{l:'محلية',e:'📍',c:'c-local',col:'#f59e0b'},
+  arabic:{l:'عربية',e:'🌙',c:'c-arabic',col:'#a855f7'},
+  world:{l:'عالمية',e:'🌍',c:'c-world',col:'#14b8a6'},
+  war:{l:'حرب',e:'⚔',c:'c-war',col:'#f87171'},
+  entertainment:{l:'ترفيه',e:'🎬',c:'c-entertainment',col:'#ec4899'}
+};
+
+// ════════════ STATE ════════════
+let articles=[], user={name:'مستخدم',handle:'user',total:0,confirmed:0,rejected:0,rumorBusts:0};
+let fypCat='all', searchCat='all', searchQ='';
+let pubType='news', sources=[], uploadedFiles=[];
+let sourceCounter=0;
+
+// ════════════ DEMO DATA ════════════
+const DEMO = [
+  {id:'d1',type:'news',title:'الأمم المتحدة تطالب بوقف فوري لإطلاق النار',cat:'war',
+   body:'طالب مجلس الأمن الدولي بوقف فوري لإطلاق النار، مستنداً إلى تقارير ميدانية موثقة تكشف تدهوراً حاداً في الأوضاع الإنسانية وسقوط أعداد كبيرة من المدنيين. وأكد المتحدث الرسمي أن الأمين العام سيتوجه بنداء طارئ لجميع أطراف النزاع، مشدداً على ضرورة الالتزام بأحكام القانون الدولي الإنساني.',
+   sources:[{name:'موقع الأمم المتحدة الرسمي',url:'https://www.un.org/ar/news/story/2024/01/ceasefire'}],
+   files:[],trust:'confirmed',confidence:92,
+   author:'رويترز',authorVerified:true,authorColor:'#3b82f6',
+   time:Date.now()-3600000,likes:342,comments:128,shares:96,rumorOriginal:''},
+  {id:'d2',type:'rumor',title:'تفنيد: لقطة الـ "مقذوف الفضائي" ليست حقيقية',cat:'tech',
+   body:'انتشرت مقاطع مصورة تزعم أن ناسا أطلقت مركبة فضائية سرية فوق المدن الكبرى. التحقيق المستقل أثبت أن اللقطات صُنعت بواسطة برامج الرسوم المتحركة ثلاثية الأبعاد. لا يوجد أي إطلاق ناسا في هذا التاريخ وفق السجلات الرسمية المنشورة.',
+   sources:[{name:'موقع ناسا الرسمي - جدول الإطلاقات',url:'https://www.nasa.gov/launchschedule/'},{name:'تقرير Snopes للتحقق',url:'https://www.snopes.com/fact-check/nasa-secret-launch/'}],
+   files:[],trust:'confirmed',confidence:97,
+   author:'طقس العرب',authorVerified:true,authorColor:'#22c55e',
+   time:Date.now()-7200000,likes:1200,comments:64,shares:420,rumorOriginal:'ناسا تطلق مركبة فضائية سرية فوق المدن — شاهدوا اللقطات'},
+  {id:'d3',type:'news',title:'آبل تكشف عن المعالج M4 بتحسينات قياسية في الذكاء الاصطناعي',cat:'tech',
+   body:'أعلنت شركة آبل رسمياً عن معالج M4 الجديد الذي يتفوق بنسبة 40% على سابقه في مهام الذكاء الاصطناعي المحلية، ويتميز بكفاءة طاقة أعلى بكثير. سيدخل المعالج ضمن الأجهزة الجديدة التي ستكشف عنها الشركة خلال المؤتمر القادم.',
+   sources:[{name:'المؤتمر الصحفي الرسمي لآبل',url:'https://www.apple.com/newsroom/2024/m4-chip-announcement'}],
+   files:[],trust:'confirmed',confidence:95,
+   author:'The Verge عربي',authorVerified:true,authorColor:'#60a5fa',
+   time:Date.now()-14400000,likes:890,comments:215,shares:340,rumorOriginal:''},
+  {id:'d4',type:'news',title:'توقعات بموجة حر غير مسبوقة الأسبوع القادم',cat:'local',
+   body:'أصدرت هيئة الأرصاد تحذيراً من موجة حر استثنائية قد تبلغ ذروتها بحلول منتصف الأسبوع. نصح المختصون بتجنب الخروج في ساعات الذروة وشرب كميات وفيرة من الماء.',
+   sources:[{name:'موقع طقس العرب',url:'https://www.arab.weather/news/heatwave-2024'}],
+   files:[],trust:'unconfirmed',confidence:58,
+   author:'سارة منصور',authorVerified:false,authorColor:'#f59e0b',
+   time:Date.now()-86400000,likes:96,comments:32,shares:44,rumorOriginal:''},
+  {id:'d5',type:'news',title:'قمة عربية طارئة لبحث ملفات الأمن الإقليمي',cat:'arabic',
+   body:'تنعقد قمة عربية طارئة لمناقشة آخر المستجدات الأمنية وسبل التعاون الاقتصادي المشترك. يُتوقع صدور بيان ختامي يرسم ملامح الموقف العربي الموحد.',
+   sources:[{name:'جامعة الدول العربية',url:'https://www.lasportal.org/ar/news/summit2024'}],
+   files:[],trust:'unconfirmed',confidence:62,
+   author:'الجزيرة',authorVerified:true,authorColor:'#a855f7',
+   time:Date.now()-21600000,likes:420,comments:88,shares:176,rumorOriginal:''}
+];
+
+function loadData(){
+  const a=localStorage.getItem('kh2_articles');
+  const u=localStorage.getItem('kh2_user');
+  articles=a?JSON.parse(a):[...DEMO];
+  user=u?JSON.parse(u):{name:'مستخدم',handle:'user',total:0,confirmed:0,rejected:0,rumorBusts:0};
+  if(!a) saveData();
+}
+function saveData(){
+  localStorage.setItem('kh2_articles',JSON.stringify(articles));
+  localStorage.setItem('kh2_user',JSON.stringify(user));
+}
+
+// ════════════ CARD RENDER ════════════
+function timeAgo(ts){
+  const d=Date.now()-ts,m=Math.floor(d/60000),h=Math.floor(d/3600000),dy=Math.floor(d/86400000);
+  if(m<1)return'الآن';if(m<60)return`منذ ${m}د`;if(h<24)return`منذ ${h}س`;return`منذ ${dy}ي`;
+}
+function trustColor(c){return c>=75?'var(--green)':c>=50?'var(--amber)':'var(--red)';}
+
+function renderCard(a,delay=0){
+  const cat=CATS[a.cat]||{l:a.cat,e:'📰',c:'',col:'#888'};
+  const isRumor=a.type==='rumor';
+  const imgHTML=a.files&&a.files.length&&a.files[0].type==='image'
+    ?`<div class="card-img-wrap"><img src="${a.files[0].data}" loading="lazy"><span class="badge-time">${timeAgo(a.time)}</span></div>`
+    :`<div class="card-img-wrap"><div class="card-img-placeholder" style="background:${cat.col}18">${isRumor?'🚫':cat.e}</div><span class="badge-time">${timeAgo(a.time)}</span></div>`;
+  const trustBadge=isRumor?'badge-rumor-bust':a.trust==='confirmed'?'badge-confirmed':'badge-unconfirmed';
+  const trustLabel=isRumor?'✓ إبطال شائعة':a.trust==='confirmed'?'✓ مؤكد':'⚠ غير مؤكد';
+  return `<div class="news-card ${isRumor?'rumor-card':''}" style="animation-delay:${delay}ms" onclick="openArticle('${a.id}')">
+    ${imgHTML}
+    <span class="card-overlay-badge ${trustBadge}">${trustLabel}</span>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="cat-pill ${cat.c}">${cat.e} ${cat.l}</span>
+        ${isRumor?'<span class="rumor-pill">🚫 إبطال شائعة</span>':''}
+      </div>
+      <div class="card-title">${a.title}</div>
+      <div class="card-trust-row">
+        <span class="trust-label">درجة الثقة:</span>
+        <div class="trust-bar-wrap"><div class="trust-bar-fill" style="width:${a.confidence}%;background:${trustColor(a.confidence)}"></div></div>
+        <span class="trust-pct" style="color:${trustColor(a.confidence)}">${a.confidence}%</span>
+      </div>
+      <div class="card-footer">
+        <div class="author-row">
+          <div class="avatar-sm" style="background:${a.authorColor||'#3b82f6'}">${(a.author||'؟')[0]}</div>
+          <div class="author-name-sm">${a.author||'مجهول'}${a.authorVerified?'<span class="v-check">✓</span>':''}</div>
+        </div>
+        <div class="card-actions">
+          <button class="action-btn" onclick="event.stopPropagation()">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            ${a.comments||0}
+          </button>
+          <button class="action-btn" onclick="event.stopPropagation()">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            ${a.shares||0}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderFeed(){
+  let list=[...articles];
+  if(fypCat!=='all') list=list.filter(a=>a.cat===fypCat);
+  list.sort((a,b)=>b.time-a.time);
+  document.getElementById('fyp-feed').innerHTML=list.length?list.map((a,i)=>renderCard(a,i*35)).join(''):'<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-t">لا توجد أخبار في هذا التصنيف</div></div>';
+}
+
+function doSearch(q){
+  searchQ=q;
+  const res=document.getElementById('search-results');
+  if(!q.trim()){res.innerHTML='<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-t">ابحث عن أي خبر<br><span style="color:var(--text3);font-size:12px">بالعنوان أو المحتوى أو المصدر</span></div></div>';return;}
+  const ql=q.toLowerCase();
+  let list=articles.filter(a=>{
+    const srcMatch=a.sources&&a.sources.some(s=>s.name.includes(q)||s.url.includes(q));
+    return (a.title.includes(q)||a.body.includes(q)||srcMatch)&&(searchCat==='all'||a.cat===searchCat);
+  });
+  res.innerHTML=list.length?list.map((a,i)=>renderCard(a,i*30)).join(''):`<div class="empty-state"><div class="empty-icon">😕</div><div class="empty-t">لا نتائج لـ "${q}"</div></div>`;
+}
+
+// ════════════ ARTICLE DETAIL ════════════
+function openArticle(id){
+  const a=articles.find(x=>x.id===id);
+  if(!a)return;
+  const cat=CATS[a.cat]||{l:a.cat,e:'📰',c:'',col:'#888'};
+  const isRumor=a.type==='rumor';
+  const confColor=trustColor(a.confidence);
+
+  let srcHTML=a.sources.map((s,i)=>`
+    <div class="source-card" onclick="openSource('${encodeURIComponent(s.url)}')">
+      <div class="src-num">${i+1}</div>
+      <div class="src-info"><div class="src-name">${s.name}</div><div class="src-url">${s.url}</div></div>
+      <div class="src-arrow">›</div>
+    </div>`).join('');
+
+  let filesHTML='';
+  if(a.files&&a.files.length){
+    filesHTML=`<div class="section-label">الأدلة والملفات</div>
+    <div class="evidence-grid">${a.files.map(f=>f.type==='image'?`<div class="evidence-thumb" onclick="openLightbox('${f.data}')"><img src="${f.data}" loading="lazy"></div>`:`<div class="evidence-thumb">📄</div>`).join('')}</div>`;
+  }
+
+  let rumorHTML=isRumor?`
+    <div class="rumor-bust-section">
+      <div class="rbs-title">🚫 الشائعة التي تم إبطالها</div>
+      <div class="rbs-body">"${a.rumorOriginal||'شائعة منتشرة'}"</div>
+    </div>`:'';
+
+  const checks=['تطابق محتوى الخبر مع المصادر','المصادر مستقلة عن بعضها','لا توجد تناقضات في المعلومات','المصدر الأساسي موثوق'];
+
+  const d=`
+    <div class="article-badges">
+      <span class="cat-pill ${cat.c}">${cat.e} ${cat.l}</span>
+      ${isRumor?'<span class="rumor-pill" style="background:rgba(168,85,247,0.15);color:#a855f7;padding:4px 12px;border-radius:8px;font-size:11px;font-weight:700">🚫 إبطال شائعة</span>':''}
+      <span style="background:${a.trust==='confirmed'?'rgba(34,197,94,0.12)':'rgba(245,158,11,0.12)'};color:${a.trust==='confirmed'?'var(--green)':'var(--amber)'};padding:4px 12px;border-radius:8px;font-size:11px;font-weight:700">${a.trust==='confirmed'?'✓ مؤكد':'⚠ غير مؤكد'}</span>
+    </div>
+    <div class="article-title">${a.title}</div>
+    ${rumorHTML}
+    <div class="article-author-row">
+      <div class="avatar-md" style="background:${a.authorColor||'#3b82f6'}">${(a.author||'؟')[0]}</div>
+      <div class="author-info-col">
+        <div class="author-name-md">${a.author||'مجهول'}${a.authorVerified?'<span class="v-check">✓</span>':''}</div>
+        <div class="author-sub">${timeAgo(a.time)} • ${CATS[a.cat]?.l||a.cat}</div>
+      </div>
+      <button class="follow-btn">متابعة</button>
+    </div>
+    <div class="article-trust-bar">
+      <div class="atb-row"><span class="atb-label">درجة الثقة</span><span class="atb-pct" style="color:${confColor}">${a.confidence}%</span></div>
+      <div class="atb-track"><div class="atb-fill" style="width:0%;background:${confColor}" id="atf-${a.id}"></div></div>
+      <div class="atb-sub">تم التحقق بواسطة الذكاء الاصطناعي ومصادر موثوقة. تم العثور على ${a.sources.length} مصدر${a.sources.length>1?'اً':''} مستقل${a.sources.length>1?'ة':''}.</div>
+    </div>
+    <div class="article-body-text">${a.body}</div>
+    ${filesHTML}
+    <div class="section-label">المصادر (${a.sources.length})</div>
+    ${srcHTML}
+    <div class="ai-explain">
+      <div class="ai-explain-title"><div class="ai-icon">🧠</div> تفسير الذكاء الاصطناعي — لماذا تم تصنيف هذا الخبر كـ${a.trust==='confirmed'?'مؤكد':'غير مؤكد'}؟</div>
+      <div class="ai-check-list">
+        ${checks.map(c=>`<div class="ai-check-item"><span class="ck">✓</span>${c}</div>`).join('')}
+        ${isRumor?'<div class="ai-check-item"><span class="ck" style="color:var(--purple)">★</span> إبطال شائعة موثق — تقييم مرتفع</div>':''}
+      </div>
+    </div>
+    <div class="article-actions">
+      <button class="art-action"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>${a.likes||0}</button>
+      <button class="art-action"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${a.comments||0}</button>
+      <button class="art-action"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>${a.shares||0}</button>
+      <button class="art-action"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>حفظ</button>
+    </div>`;
+  document.getElementById('article-content').innerHTML=d;
+  document.getElementById('article-modal').classList.add('open');
+  setTimeout(()=>{const el=document.getElementById('atf-'+a.id);if(el)el.style.width=a.confidence+'%';},200);
+}
+function closeArticleIfOverlay(e){if(e.target===document.getElementById('article-modal'))closeArticleModal();}
+function closeArticleModal(){document.getElementById('article-modal').classList.remove('open');}
+function openSource(u){window.open(decodeURIComponent(u),'_blank');}
+function openLightbox(src){document.getElementById('lightbox-img').src=src;document.getElementById('lightbox').classList.add('open');}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');}
+
+// ════════════ PUBLISH ════════════
+function selectType(t){
+  pubType=t;
+  document.getElementById('type-news').classList.toggle('selected',t==='news');
+  document.getElementById('type-rumor').classList.toggle('selected',t==='rumor');
+  document.getElementById('rumor-banner-wrap').style.display=t==='rumor'?'block':'none';
+  document.getElementById('rumor-original-row').style.display=t==='rumor'?'block':'none';
+  document.getElementById('body-label').innerHTML=t==='rumor'?'تفنيد الشائعة <span class="req">*</span>':'تفاصيل الخبر <span class="req">*</span>';
+}
+
+function addSource(){
+  sourceCounter++;
+  const id=`src-${sourceCounter}`;
+  const div=document.createElement('div');
+  div.className='source-item';div.id=id;
+  div.innerHTML=`<div class="source-num">${sources.length+1}</div>
+    <div class="source-inputs">
+      <input class="source-input-sm" placeholder="اسم المصدر (مثل: موقع رويترز الرسمي)" id="${id}-name">
+      <input class="source-input-sm source-url" placeholder="https://رابط-المقالة-المباشر-وليس-الموقع-فقط" id="${id}-url" type="url">
+    </div>
+    <button class="source-remove" onclick="removeSource('${id}')">×</button>`;
+  document.getElementById('sources-list').appendChild(div);
+  sources.push(id);
+  renumberSources();
+}
+function removeSource(id){
+  document.getElementById(id)?.remove();
+  sources=sources.filter(s=>s!==id);
+  renumberSources();
+}
+function renumberSources(){
+  document.querySelectorAll('.source-num').forEach((el,i)=>el.textContent=i+1);
+}
+
+function handleFiles(input){
+  const grid=document.getElementById('files-grid');
+  Array.from(input.files).forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const data=e.target.result;
+      const isImg=file.type.startsWith('image/');
+      const fid='f'+Date.now()+Math.random().toString(36).slice(2,6);
+      uploadedFiles.push({id:fid,data,type:isImg?'image':'doc',name:file.name});
+      const thumb=document.createElement('div');
+      thumb.className='file-thumb';thumb.id='ft-'+fid;
+      thumb.innerHTML=isImg?`<img src="${data}"><span class="remove-file" onclick="removeFile('${fid}')">×</span>`:`<span>📄</span><span style="font-size:9px;color:var(--text3);padding:0 4px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%">${file.name.slice(0,12)}</span><span class="remove-file" onclick="removeFile('${fid}')">×</span>`;
+      const addBtn=grid.querySelector('.add-file-btn');
+      grid.insertBefore(thumb,addBtn);
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value='';
+}
+function removeFile(id){
+  uploadedFiles=uploadedFiles.filter(f=>f.id!==id);
+  document.getElementById('ft-'+id)?.remove();
+}
+
+function wordCount(t){return t.trim().split(/\s+/).filter(w=>w).length;}
+
+function validateSources(){
+  return sources.map(sid=>{
+    const name=(document.getElementById(sid+'-name')?.value||'').trim();
+    const url=(document.getElementById(sid+'-url')?.value||'').trim();
+    return {name,url};
+  }).filter(s=>s.url);
+}
+
+function isArticleUrl(url){
+  try{const u=new URL(url);const p=u.pathname;return p.length>1&&/[\w\-]+/.test(p.slice(1));}catch{return false;}
+}
+
+function calcConfidence(body,srcs,isRumor,files){
+  let s=0;
+  const wc=wordCount(body);
+  if(wc>=150)s+=35;else if(wc>=80)s+=22;else s+=8;
+  if(srcs.length>=3)s+=30;else if(srcs.length===2)s+=22;else if(srcs.length===1)s+=14;
+  const articleUrls=srcs.filter(s=>isArticleUrl(s.url)).length;
+  s+=articleUrls*8;
+  if(files.length>0)s+=10;
+  if(isRumor)s+=12;
+  s+=Math.floor(Math.random()*8);
+  return Math.min(s,99);
+}
+
+function publishArticle(){
+  const title=document.getElementById('pub-title').value.trim();
+  const cat=document.getElementById('pub-cat').value;
+  const body=document.getElementById('pub-body').value.trim();
+  const rumorOrig=pubType==='rumor'?document.getElementById('pub-rumor-original').value.trim():'';
+  if(!title){showToast('⚠ أدخل عنوان الخبر','warn');return;}
+  if(!cat){showToast('⚠ اختر التصنيف','warn');return;}
+  if(!body){showToast('⚠ أدخل تفاصيل الخبر','warn');return;}
+  if(wordCount(body)<80){showToast(`النص قصير (${wordCount(body)} كلمة) — الحد الأدنى 80`,'warn');return;}
+  if(pubType==='rumor'&&!rumorOrig){showToast('⚠ أدخل نص الشائعة المراد إبطالها','warn');return;}
+  const srcs=validateSources();
+  if(!srcs.length){showToast('⚠ أضف مصدراً واحداً على الأقل مع رابط مباشر','warn');return;}
+  const badUrls=srcs.filter(s=>!isArticleUrl(s.url));
+  if(badUrls.length){showToast('⚠ المصادر يجب أن تكون روابط مقالات مباشرة، ليس فقط روابط المواقع','warn');return;}
+  const btn=document.getElementById('submit-btn');
+  btn.disabled=true;btn.textContent='جاري التحقق...';
+  showVerifyModal(title,body,srcs,pubType==='rumor',uploadedFiles.length>0,()=>{
+    const confidence=calcConfidence(body,srcs,pubType==='rumor',uploadedFiles);
+    let trust;
+    if(confidence>=65)trust='confirmed';
+    else if(confidence>=40)trust='unconfirmed';
+    else trust=null;
+    const cat2=CATS[cat]||{col:'#888'};
+    user.total++;
+    if(trust){
+      if(trust==='confirmed')user.confirmed++;
+      if(pubType==='rumor'&&trust==='confirmed')user.rumorBusts++;
+      const a={
+        id:'u'+Date.now(),type:pubType,title,cat,body,
+        sources:srcs,files:[...uploadedFiles],
+        trust,confidence,rumorOriginal:rumorOrig,
+        author:user.name,authorVerified:getTier()==='verified',
+        authorColor:cat2.col||'#3b82f6',
+        time:Date.now(),likes:0,comments:0,shares:0
+      };
+      articles.unshift(a);
+    } else {
+      user.rejected++;
+    }
+    saveData();
+    document.getElementById('verify-modal').classList.remove('open');
+    btn.disabled=false;btn.innerHTML=`<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="m22 2-11 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> إرسال للتحقق`;
+    if(trust){
+      const isRumorBust=pubType==='rumor'&&trust==='confirmed';
+      showToast(isRumorBust?`🚫 تم إبطال الشائعة بنجاح! +تقييم مرتفع`:trust==='confirmed'?'✅ تم نشر الخبر — مؤكد':'⚠ تم نشر الخبر — غير مؤكد',isRumorBust?'purple':trust==='confirmed'?'ok':'warn');
+    } else {
+      showToast('❌ رُفض — أضف مصادر أكثر وتفاصيل أوفر','err');
+    }
+    // reset form
+    ['pub-title','pub-body','pub-source','pub-rumor-original'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    document.getElementById('pub-cat').value='';
+    document.getElementById('tc').textContent='0';
+    document.getElementById('bc').textContent='0';
+    document.getElementById('sources-list').innerHTML='';
+    sources=[];sourceCounter=0;
+    uploadedFiles=[];
+    const g=document.getElementById('files-grid');
+    g.innerHTML=`<div class="add-file-btn" onclick="document.getElementById('file-input').click()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>إضافة</span></div>`;
+    selectType('news');
+    updateProfileUI();renderFeed();
+    showPage('fyp',document.getElementById('nb-fyp'));
+  });
+}
+
+// ════════════ VERIFY ANIMATION ════════════
+function showVerifyModal(title,body,srcs,isRumor,hasFiles,onDone){
+  const steps=[
+    {label:'تحليل محتوى الخبر',dur:700},
+    {label:'فحص المصادر والروابط',dur:900},
+    {label:'مطابقة المعلومات',dur:700},
+    {label:'تقييم الموثوقية',dur:600}
+  ];
+  document.getElementById('vm-title').textContent='التحقق من الخبر';
+  const wrap=document.getElementById('verify-content');
+  wrap.innerHTML=`
+    <div class="verify-ring-wrap">
+      <div class="verify-ring">
+        <svg viewBox="0 0 120 120"><circle class="ring-track" cx="60" cy="60" r="55"/><circle class="ring-fill" id="vring" cx="60" cy="60" r="55"/></svg>
+        <div class="ring-pct"><div class="ring-num" id="vpct">0%</div><div class="ring-label">جاري التحقق...</div></div>
+      </div>
+    </div>
+    <div class="verify-steps" id="vsteps">
+      ${steps.map((s,i)=>`<div class="verify-step" id="vs${i}">
+        <div class="step-icon pending" id="vsi${i}">⏳</div>
+        <div class="step-text">${s.label}</div>
+      </div>`).join('')}
+    </div>`;
+  document.getElementById('verify-modal').classList.add('open');
+  let pct=0,done=0;
+  const ring=document.getElementById('vring');
+  const vpct=document.getElementById('vpct');
+  function runStep(i){
+    if(i>=steps.length){ring.style.strokeDashoffset='0';vpct.textContent='100%';setTimeout(onDone,400);return;}
+    document.getElementById(`vsi${i}`).className='step-icon loading';
+    document.getElementById(`vsi${i}`).innerHTML='<div class="step-spinner"></div>';
+    setTimeout(()=>{
+      document.getElementById(`vsi${i}`).className='step-icon done';
+      document.getElementById(`vsi${i}`).innerHTML='✓';
+      done++;pct=Math.round((done/steps.length)*100);
+      vpct.textContent=pct+'%';
+      ring.style.strokeDashoffset=345-(345*(pct/100));
+      runStep(i+1);
+    },steps[i].dur);
+  }
+  setTimeout(()=>runStep(0),200);
+}
+
+// ════════════ PROFILE ════════════
+function getTier(){
+  const acc=user.total>0?user.confirmed/user.total:0;
+  if(user.total>=10&&acc>=0.9)return'verified';
+  if(user.total>=5&&acc>=0.7)return'trusted';
+  return'new';
+}
+function updateProfileUI(){
+  const tier=getTier();
+  const acc=user.total>0?Math.round((user.confirmed/user.total)*100):0;
+  document.getElementById('p-avatar').textContent=user.name[0]||'م';
+  document.getElementById('p-name').innerHTML=user.name+(tier==='verified'?'<span class="v-check">✓</span>':'');
+  document.getElementById('p-handle').textContent='@'+user.handle;
+  document.getElementById('ps-total').textContent=user.total;
+  document.getElementById('ps-conf').textContent=user.confirmed;
+  document.getElementById('ps-rej').textContent=user.rejected;
+  document.getElementById('p-acc-pct').textContent=acc+'%';
+  document.getElementById('p-acc-bar').style.width=acc+'%';
+  document.getElementById('sr-name-sub').textContent='@'+user.handle;
+  const tb=document.getElementById('p-tier-badge');
+  const tierLabels={new:'حساب عادي',trusted:'✓ موثوق',verified:'✓ ناشر موثوق'};
+  const tierCls={new:'tier-new',trusted:'tier-trusted',verified:'tier-verified'};
+  tb.textContent=tierLabels[tier];tb.className='profile-tier-badge '+tierCls[tier];
+  ['tier-new','tier-trusted','tier-verified'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.classList.remove('current-tier');
+    el.querySelector('.tp-dot').className='tp-dot';
+  });
+  const map={new:'tier-new',trusted:'tier-trusted',verified:'tier-verified'};
+  const order=['new','trusted','verified'];
+  const ci=order.indexOf(tier);
+  order.forEach((t,i)=>{
+    const el=document.getElementById(map[t]);
+    const dot=el.querySelector('.tp-dot');
+    if(i<ci)dot.classList.add('done');
+    else if(i===ci){dot.classList.add('curr');el.classList.add('current-tier');}
+  });
+}
+
+// ════════════ NAV ════════════
+let prevNavBtn=null;
+function showPage(name,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(btn){btn.classList.add('active');prevNavBtn=btn;}
+  if(name==='profile')updateProfileUI();
+  if(name==='fyp')renderFeed();
+  window.scrollTo(0,0);
+}
+function goHome(){showPage('fyp',document.getElementById('nb-fyp'));}
+
+// ════════════ FILTER ════════════
+function setFypCat(c,el){fypCat=c;document.querySelectorAll('#fyp-chips .chip').forEach(x=>x.classList.remove('active'));el.classList.add('active');renderFeed();}
+function setSearchCat(c,el){searchCat=c;document.querySelectorAll('#search-chips .chip').forEach(x=>x.classList.remove('active'));el.classList.add('active');doSearch(searchQ);}
+function setFypTab(t,el){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
+
+// ════════════ UTILS ════════════
+function cc(inputId,countId,max){document.getElementById(countId).textContent=document.getElementById(inputId).value.length;}
+let toastT;
+function showToast(msg,type='ok'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast '+type+' show';
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),3500);
+}
+function editName(){
+  const n=prompt('اسمك:',user.name);
+  if(n&&n.trim()){const h=prompt('معرّفك (بدون @):',user.handle)||user.handle;user.name=n.trim();user.handle=h.replace('@','').trim()||user.handle;saveData();updateProfileUI();showToast('✅ تم التحديث','ok');}
+}
+function clearData(){
+  if(confirm('حذف كل البيانات؟')){localStorage.clear();loadData();updateProfileUI();renderFeed();showToast('✅ تمت إعادة التعيين','ok');}}
+
+// ════════════ INIT ════════════
+loadData();
+renderFeed();
+updateProfileUI();
+addSource(); // add first source by default
+</script>
+</body>
+</html>

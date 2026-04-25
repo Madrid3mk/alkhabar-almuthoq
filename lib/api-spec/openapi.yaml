@@ -48,6 +48,16 @@ paths:
           schema:
             type: string
             enum: [high, medium, low]
+        - name: category
+          in: query
+          description: Filter by category label (Arabic). Use empty/omit for all categories.
+          schema:
+            type: string
+        - name: q
+          in: query
+          description: Free-text search across title and body.
+          schema:
+            type: string
         - name: limit
           in: query
           schema:
